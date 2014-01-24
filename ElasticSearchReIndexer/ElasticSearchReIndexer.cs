@@ -26,17 +26,19 @@ namespace ElasticSearchReIndexer
         {
             var reIndexTaskCancellationUnit = new JobCancellationUnit();
 
-            // start scrolling - out = es docs
+            // tap - start scrolling - out = es docs
             var scroller = new EsScroller(_sourceConfig);
-            var sourceDocs = scroller.StartScrollingToEnd();
+            var sourceDocs = scroller.StartScrollingToEnd(reIndexTaskCancellationUnit);
 
-            // start batching - in = es docs, out = es doc batches
+            // batcher/transformer - start batching - in = es docs, out = es doc batches
             var batcher = new EsDocumentBatcher(_targetConfig.BatchSize);
-            var sourceDocBatches = batcher.StartBatching(sourceDocs);
+            var sourceDocBatches = batcher.StartBatching(reIndexTaskCancellationUnit, sourceDocs);
 
-            // start indexing - in = es doc batches
+            // throttler
+
+            // sink & worker pool - start indexing - in = es doc batches
             var indexer = new EsIndexerManager(_targetConfig);
-            indexer.StartIndexing(sourceDocBatches);
+            indexer.StartIndexing(reIndexTaskCancellationUnit, sourceDocBatches);
         }
     }
 }

@@ -17,15 +17,60 @@ namespace ElasticSearchReIndexer.Workers
         }
 
         public BlockingCollection<List<EsDocument>> StartBatching(
+            JobCancellationUnit cancellationUnit,
             BlockingCollection<EsDocument> source)
         {
-            // watch the source
+            var docBatches = new BlockingCollection<List<EsDocument>>();
 
-            // when batch complete
+            var batchTask = new Task(
+                () => this.ScheduleDocBatching(cancellationUnit, source, docBatches),
+                cancellationUnit.Token);
 
-            // add to the result
+            batchTask.Start();
 
-            // when source complete, add an any orphans to final batch.
+            return docBatches;
+        }
+
+        private void ScheduleDocBatching(
+            JobCancellationUnit cancellationUnit,
+            BlockingCollection<EsDocument> source,
+            BlockingCollection<List<EsDocument>> destination)
+        {
+            try
+            {
+                var currentBatch = new List<EsDocument>(_batchSize);
+
+                while (source.Any() || !source.IsCompleted)
+                {
+                    if (currentBatch.Count() == _batchSize)
+                    {
+                        destination.Add(currentBatch);
+                        currentBatch = new List<EsDocument>(_batchSize);
+                    }
+
+                    EsDocument currentDoc;
+                    if (source.TryTake(out currentDoc, 5 * 1000, cancellationUnit.Token))
+                    {
+                        currentBatch.Add(currentDoc);
+                    }
+                }
+
+                if (currentBatch.Any())
+                {
+                    destination.Add(currentBatch);
+                }
+            }
+            //catch (TaskCanceledException) // not doing this yet - we just stop when our predecessor has finished.
+            //{
+            //
+            //}
+            catch (Exception ex)
+            {
+                //TODO: logging
+                destination.CompleteAdding();
+                
+                throw;
+            }
         }
     }
 }

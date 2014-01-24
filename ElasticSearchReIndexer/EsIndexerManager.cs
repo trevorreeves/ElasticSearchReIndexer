@@ -17,13 +17,37 @@ namespace ElasticSearchReIndexer
             _config = config;
         }
 
-        public void StartIndexing(BlockingCollection<List<EsDocument>> sourceBatches)
+        public void StartIndexing(
+            JobCancellationUnit cancellationUnit,
+            BlockingCollection<List<EsDocument>> sourceBatches)
         {
-            // wait and get a batch
+            var indexingTask = new Task(
+                () => ScheduleIndexWorkers(cancellationUnit, sourceBatches),
+                cancellationUnit.Token);
 
-            // wait to be under the index threshold...
+            indexingTask.Start();
+        }
 
-            // create a new index worker and work it y'all
+        private void ScheduleIndexWorkers(
+            JobCancellationUnit cancellationUnit,
+            BlockingCollection<List<EsDocument>> sourceBatches)
+        {
+            while (sourceBatches.Any() || !sourceBatches.IsCompleted)
+            {
+                List<EsDocument> currentBatch;
+                if (sourceBatches.TryTake(out currentBatch, 5 * 1000, cancellationUnit.Token))
+                {
+                    var batchIndexTask = new Task(
+                        () =>
+                        {
+                            var indexer = new IndexWorker(_config);
+                            indexer.Index(currentBatch);
+                        },
+                        cancellationUnit.Token);
+
+                    batchIndexTask.Start();
+                }
+            }
         }
     }
 }

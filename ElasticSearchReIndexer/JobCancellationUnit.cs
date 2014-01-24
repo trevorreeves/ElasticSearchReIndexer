@@ -18,6 +18,40 @@ namespace ElasticSearchReIndexer
             _cancelToken = _cancelTokenSource.Token;
         }
 
+        public void Cancel()
+        {
+            _cancelTokenSource.Cancel();
+        }
+
+        public void ThrowIfCancelled()
+        {
+            _cancelToken.ThrowIfCancellationRequested();
+        }
+
+        public bool IsCancellationRequested
+        {
+            get
+            {
+                return _cancelTokenSource.IsCancellationRequested;
+            }
+        }
+
+        public CancellationTokenSource TokenSource
+        {
+            get
+            {
+                return _cancelTokenSource;
+            }
+        }
+
+        public CancellationToken Token
+        {
+            get
+            {
+                return _cancelToken;
+            }
+        }
+
         // add dependency model?
     }
 }

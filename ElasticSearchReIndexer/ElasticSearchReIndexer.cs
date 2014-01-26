@@ -37,7 +37,7 @@ namespace ElasticSearchReIndexer
             // throttler
 
             // sink & worker pool - start indexing - in = es doc batches
-            var indexer = new EsIndexerManager(_targetConfig);
+            var indexer = new EsIndexer(_targetConfig);
             indexer.StartIndexing(reIndexTaskCancellationUnit, sourceDocBatches);
         }
     }

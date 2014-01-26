@@ -40,7 +40,9 @@ namespace ElasticSearchReIndexer.Workers
             {
                 var currentBatch = new List<EsDocument>(_batchSize);
 
-                while (source.Any() || !source.IsCompleted)
+                this.ThrowIfSuccessorCancelled(cancellationUnit, source);
+
+                while (this.PossiblyMoreInSourceStream(source))
                 {
                     if (currentBatch.Count() == _batchSize)
                     {
@@ -53,6 +55,8 @@ namespace ElasticSearchReIndexer.Workers
                     {
                         currentBatch.Add(currentDoc);
                     }
+
+                    this.ThrowIfSuccessorCancelled(cancellationUnit, source);
                 }
 
                 if (currentBatch.Any())
@@ -60,17 +64,37 @@ namespace ElasticSearchReIndexer.Workers
                     destination.Add(currentBatch);
                 }
             }
-            //catch (TaskCanceledException) // not doing this yet - we just stop when our predecessor has finished.
-            //{
-            //
-            //}
+            catch (TaskCanceledException) 
+            {
+                // our sucessors should have stopped, but lets dot the i's...
+                destination.CompleteAdding();
+                throw;
+            }
             catch (Exception ex)
             {
                 //TODO: logging
-                destination.CompleteAdding();
+                cancellationUnit.Cancel(); // cancel predecessors
+                destination.CompleteAdding(); // tell successors there's no more where that came from.
                 
                 throw;
             }
+        }
+
+        private void ThrowIfSuccessorCancelled(
+            JobCancellationUnit cancellationUnit,
+            BlockingCollection<EsDocument> source)
+        {
+            // if something cancelled the job, but our predecessors stream is still going, we can
+            // assume that our successor died, so we should stop sending it data...
+            if (cancellationUnit.IsCancellationRequested && !source.IsCompleted)
+            {
+                cancellationUnit.ThrowIfCancelled();
+            }
+        }
+
+        private bool PossiblyMoreInSourceStream(BlockingCollection<EsDocument> source)
+        {
+            return source.Any() || !source.IsCompleted;
         }
     }
 }

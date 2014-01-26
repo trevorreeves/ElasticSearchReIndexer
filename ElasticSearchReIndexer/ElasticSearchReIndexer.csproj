@@ -47,7 +47,7 @@
     <Compile Include="Config\SourceScrollConfig.cs" />
     <Compile Include="Config\TargetIndexingConfig.cs" />
     <Compile Include="ElasticSearchReIndexer.cs" />
-    <Compile Include="EsIndexerManager.cs" />
+    <Compile Include="EsIndexer.cs" />
     <Compile Include="EsScroller.cs" />
     <Compile Include="EsDocument.cs" />
     <Compile Include="EsDocumentBatcher.cs" />

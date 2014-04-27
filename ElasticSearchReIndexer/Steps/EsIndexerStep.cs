@@ -2,17 +2,18 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
+using ElasticSearchReIndexer.Models;
 
-namespace ElasticSearchReIndexer
+namespace ElasticSearchReIndexer.Steps
 {
-    public class EsIndexer
+    public class EsIndexerStep
     {
         private readonly ITargetIndexingConfig _config;
 
-        public EsIndexer(ITargetIndexingConfig config)
+        public EsIndexerStep(ITargetIndexingConfig config)
         {
             _config = config;
         }
@@ -42,7 +43,7 @@ namespace ElasticSearchReIndexer
                         var batchIndexTask = new Task(
                             () =>
                             {
-                                var indexer = new IndexWorker(_config);
+                                var indexer = new IndexWorker(new EsIndexClient(_config));
                                 indexer.Index(currentBatch);
                             },
                             cancellationUnit.Token);

@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Workers;
+using ElasticSearchReIndexer.Steps;
+using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer
 {
@@ -27,17 +29,17 @@ namespace ElasticSearchReIndexer
             var reIndexTaskCancellationUnit = new JobCancellationUnit();
 
             // tap - start scrolling - out = es docs
-            var scroller = new EsScroller(_sourceConfig);
+            var scroller = new EsScrollerStep(_sourceConfig);
             var sourceDocs = scroller.StartScrollingToEnd(reIndexTaskCancellationUnit);
 
             // batcher/transformer - start batching - in = es docs, out = es doc batches
-            var batcher = new EsDocumentBatcher(_targetConfig.BatchSize);
+            var batcher = new EsDocumentBatcherStep(_targetConfig.BatchSize);
             var sourceDocBatches = batcher.StartBatching(reIndexTaskCancellationUnit, sourceDocs);
 
-            // throttler
+            // TODO: throttler
 
-            // sink & worker pool - start indexing - in = es doc batches
-            var indexer = new EsIndexer(_targetConfig);
+            // sink - start indexing - in = es doc batches
+            var indexer = new EsIndexerStep(_targetConfig);
             indexer.StartIndexing(reIndexTaskCancellationUnit, sourceDocBatches);
         }
     }

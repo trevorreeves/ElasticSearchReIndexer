@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ElasticSearchReIndexer.Models;
 
-namespace ElasticSearchReIndexer.Workers
+namespace ElasticSearchReIndexer.Steps
 {
-    public class EsDocumentBatcher
+    public class EsDocumentBatcherStep
     {
         private readonly int _batchSize;
 
-        public EsDocumentBatcher(int batchSize)
+        public EsDocumentBatcherStep(int batchSize)
         {
+            Contract.Requires(batchSize > 0);
+
             _batchSize = batchSize;
         }
 
@@ -44,12 +48,14 @@ namespace ElasticSearchReIndexer.Workers
 
                 while (this.PossiblyMoreInSourceStream(source))
                 {
+                    // close the current batch if its full
                     if (currentBatch.Count() == _batchSize)
                     {
                         destination.Add(currentBatch);
                         currentBatch = new List<EsDocument>(_batchSize);
                     }
 
+                    // add another doc to the current batch
                     EsDocument currentDoc;
                     if (source.TryTake(out currentDoc, 5 * 1000, cancellationUnit.Token))
                     {
@@ -59,6 +65,8 @@ namespace ElasticSearchReIndexer.Workers
                     this.ThrowIfSuccessorCancelled(cancellationUnit, source);
                 }
 
+                // ensure all docs are pushed when total number is not exact multiple
+                // of batch size.
                 if (currentBatch.Any())
                 {
                     destination.Add(currentBatch);

@@ -5,15 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ElasticSearchReIndexer.Config;
+using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Workers;
+using ElasticSearchReIndexer.Models;
 
-namespace ElasticSearchReIndexer
+namespace ElasticSearchReIndexer.Steps
 {
-    public class EsScroller
+    public class EsScrollerStep
     {
         private readonly ISourceScrollConfig _config;
 
-        public EsScroller(ISourceScrollConfig config)
+        public EsScrollerStep(ISourceScrollConfig config)
         {
             _config = config;
         }
@@ -44,7 +46,7 @@ namespace ElasticSearchReIndexer
                 while (true)
                 {
                     // TODO: need to remember the scroll id after each request.
-                    var worker = new ScrollWorker(_config);
+                    var worker = new ScrollWorker(new EsScrollClient(_config));
                     foreach (var doc in worker.ScrollPage())
                     {
                         this.ThrowIfSuccessorCancelled(cancellationUnit);

@@ -8,6 +8,7 @@ using Castle.Windsor;
 using Castle.Windsor.Installer;
 using ElasticSearchReIndexer.Tests.Integration.TestUtils.Customisations;
 using ElasticSearchReIndexer.Tests.Integration.TestUtils.Installers;
+using ElasticSearchReIndexer.Workers;
 using Nest;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Xunit;
@@ -25,7 +26,7 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.CustomisationGroups
             var container = new WindsorContainer();
 
             container.Install(
-                FromAssembly.InDirectory(new AssemblyFilter(".", "ElasticSearchReIndexer.dll")),
+                FromAssembly.InDirectory(new AssemblyFilter(".", "ElasticSearchReIndexer.exe")),
                 new TargetConfigProviderInstaller(index, type));
 
             var indexWorker = container.Resolve<IndexWorker>();

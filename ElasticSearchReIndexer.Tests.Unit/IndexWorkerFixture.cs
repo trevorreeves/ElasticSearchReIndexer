@@ -11,6 +11,7 @@ using Xunit;
 using Moq;
 using FluentAssertions;
 using ElasticSearchReIndexer.Models;
+using ElasticSearchReIndexer.Workers;
 
 namespace ElasticSearchReIndexer.Tests.Unit
 {

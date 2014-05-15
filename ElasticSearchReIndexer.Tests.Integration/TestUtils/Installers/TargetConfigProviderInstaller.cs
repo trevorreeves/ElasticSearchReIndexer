@@ -35,8 +35,12 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Installers
             testConfigProvider.AddValue(TargetIndexingConfig.SUSPEND_INDEX_REFRESH_KEY, true);
 
             container.Register(
-                Component.For<IConfigProvider>().Instance(testConfigProvider).Named("targetConfig"),
-                Component.For<EsIndexClient>().DependsOn(Dependency.OnComponent(typeof(IConfigProvider), "targetConfig"));
+                Component.For<IConfigProvider>().Instance(testConfigProvider).Named("targetConfigProvider"),
+                Component.For<ITargetIndexingConfig>()
+                         .ImplementedBy<TargetIndexingConfig>()
+                         .DependsOn(Dependency.OnComponent(typeof(IConfigProvider), "targetConfigProvider"))
+                         .Named("TestIndexConfig")
+                         .IsDefault());
         }
     }
 }

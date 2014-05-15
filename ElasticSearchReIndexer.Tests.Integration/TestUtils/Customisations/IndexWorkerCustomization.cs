@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
+using ElasticSearchReIndexer.Workers;
 using Ploeh.AutoFixture;
 
 namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Customisations

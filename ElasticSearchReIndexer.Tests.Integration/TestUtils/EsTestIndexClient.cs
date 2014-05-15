@@ -20,7 +20,7 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
             ConnectionSettings connectionSettings, 
             string indexName)
         {
-            _client = new ElasticClient(connectionSettings));
+            _client = new ElasticClient(connectionSettings);
             _indexName = indexName;
         }
 
@@ -38,6 +38,7 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
         {
             var d = new SearchDescriptor<JObject>();
             d.Index(_indexName);
+            d.Type("all");
             d.MatchAll();
 
             return _client.Search<JObject>(d).Documents;

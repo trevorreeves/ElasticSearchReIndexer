@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using ElasticSearchReIndexer.Models;
 
-namespace ElasticSearchReIndexer
+namespace ElasticSearchReIndexer.Workers
 {
     public class IndexWorker
     {

@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
 using ElasticSearchReIndexer.Tests.Integration.TestUtils;
 using ElasticSearchReIndexer.Tests.Integration.TestUtils.CustomisationGroups;
 using ElasticSearchReIndexer.Tests.Integration.TestUtils.Customisations;
-
+using ElasticSearchReIndexer.Workers;
 using FluentAssertions;
 using Nest;
 using Newtonsoft.Json.Linq;
@@ -22,34 +21,35 @@ namespace ElasticSearchReIndexer.Tests.Integration.Workers
 {
     public class IndexWorkerFixture : IDisposable
     {
-        private IndexWorker _testIndexWorker;
+        //private IndexWorker _testIndexWorker;
 
         public IndexWorkerFixture()
         {
-            var testConfigProvider = new InMemoryConfigProvider();
-            testConfigProvider.AddValue(TargetIndexingConfig.SERVER_CONNECTION_STRING_KEY, GlobalTestSettings.TestTargetServerConnectionString);
-            testConfigProvider.AddValue(TargetIndexingConfig.INDEX_KEY, _testIndex);
-            testConfigProvider.AddValue(TargetIndexingConfig.TYPE_KEY, TEST_TYPE);
-            testConfigProvider.AddValue(TargetIndexingConfig.BATCH_SIZE_KEY, 10);
-            testConfigProvider.AddValue(TargetIndexingConfig.INDEX_THROTTLE_TIME_PERIOD_KEY, TimeSpan.FromSeconds(10));
-            testConfigProvider.AddValue(TargetIndexingConfig.MAX_INDEXES_PER_THROTTLE_KEY, 10);
-            testConfigProvider.AddValue(TargetIndexingConfig.REINSTATE_INDEX_REFRESH_KEY, true);
-            testConfigProvider.AddValue(TargetIndexingConfig.SUSPEND_INDEX_REFRESH_KEY, true);
-
-            _testIndexWorker = 
-                new IndexWorker(
-                    new EsIndexClient(
-                        new TargetIndexingConfig(
-                            testConfigProvider)));
+            //var testConfigProvider = new InMemoryConfigProvider();
+            //testConfigProvider.AddValue(TargetIndexingConfig.SERVER_CONNECTION_STRING_KEY, GlobalTestSettings.TestTargetServerConnectionString);
+            //testConfigProvider.AddValue(TargetIndexingConfig.INDEX_KEY, _testIndex);
+            //testConfigProvider.AddValue(TargetIndexingConfig.TYPE_KEY, TEST_TYPE);
+            //testConfigProvider.AddValue(TargetIndexingConfig.BATCH_SIZE_KEY, 10);
+            //testConfigProvider.AddValue(TargetIndexingConfig.INDEX_THROTTLE_TIME_PERIOD_KEY, TimeSpan.FromSeconds(10));
+            //testConfigProvider.AddValue(TargetIndexingConfig.MAX_INDEXES_PER_THROTTLE_KEY, 10);
+            //testConfigProvider.AddValue(TargetIndexingConfig.REINSTATE_INDEX_REFRESH_KEY, true);
+            //testConfigProvider.AddValue(TargetIndexingConfig.SUSPEND_INDEX_REFRESH_KEY, true);
+            //
+            //_testIndexWorker = 
+            //    new IndexWorker(
+            //        new EsIndexClient(
+            //            new TargetIndexingConfig(
+            //                testConfigProvider)));
         }
 
         [Theory]
         [CustomizedAutoData(typeof(EsIntegrationCustomisations))]
         public void BulkIndex_addsSingleDoc_Successfully(
             EsDocument testDoc, 
-            EsTestIndexClient testClient)
+            EsTestIndexClient testClient,
+            IndexWorker indexWorker)
         {
-            _testIndexWorker
+            indexWorker
                 .Index(new List<EsDocument>() { testDoc })
                 .Should().Be(true);
 
@@ -62,9 +62,13 @@ namespace ElasticSearchReIndexer.Tests.Integration.Workers
         [Theory]
         [CustomizedAutoData(typeof(EsIntegrationCustomisations))]
         public void BulkIndex_addsMultipleDoc_Successfully(
-            EsDocument doc1, EsDocument doc2, EsDocument doc3, EsTestIndexClient testClient)
+            EsDocument doc1, 
+            EsDocument doc2, 
+            EsDocument doc3, 
+            EsTestIndexClient testClient,
+            IndexWorker indexWorker)
         {
-            _testIndexWorker
+            indexWorker
                 .Index(new[] { doc1, doc2, doc3 })
                 .Should().Be(true);
 

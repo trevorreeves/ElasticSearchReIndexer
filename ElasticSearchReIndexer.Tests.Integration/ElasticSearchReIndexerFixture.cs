@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
+using ElasticSearchReIndexer.Workers;
 using FluentAssertions;
 using Nest;
 using Newtonsoft.Json.Linq;

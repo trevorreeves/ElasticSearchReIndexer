@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
+using ElasticSearchReIndexer.Workers;
 
 namespace ElasticSearchReIndexer.Steps
 {

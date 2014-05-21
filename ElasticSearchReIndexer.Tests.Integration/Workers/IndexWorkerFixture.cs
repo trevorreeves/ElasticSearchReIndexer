@@ -1,85 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Collections.Generic;
 using System.Linq;
-using ElasticSearchReIndexer.Clients;
-using ElasticSearchReIndexer.Config;
+using Castle.MicroKernel.Registration;
+using Castle.Windsor;
+using Castle.Windsor.Installer;
 using ElasticSearchReIndexer.Models;
 using ElasticSearchReIndexer.Tests.Integration.TestUtils;
-using ElasticSearchReIndexer.Tests.Integration.TestUtils.CustomisationGroups;
 using ElasticSearchReIndexer.Tests.Integration.TestUtils.Customisations;
 using ElasticSearchReIndexer.Workers;
 using FluentAssertions;
-using Nest;
-using Newtonsoft.Json.Linq;
 using Ploeh.AutoFixture;
-using Ploeh.AutoFixture.Xunit;
 using Xunit;
-using Xunit.Extensions;
 
 namespace ElasticSearchReIndexer.Tests.Integration.Workers
 {
-    public class IndexWorkerFixture : IDisposable
+    public class IndexWorkerFixture
     {
-        //private IndexWorker _testIndexWorker;
+        private readonly IFixture _fixture;
 
         public IndexWorkerFixture()
         {
-            //var testConfigProvider = new InMemoryConfigProvider();
-            //testConfigProvider.AddValue(TargetIndexingConfig.SERVER_CONNECTION_STRING_KEY, GlobalTestSettings.TestTargetServerConnectionString);
-            //testConfigProvider.AddValue(TargetIndexingConfig.INDEX_KEY, _testIndex);
-            //testConfigProvider.AddValue(TargetIndexingConfig.TYPE_KEY, TEST_TYPE);
-            //testConfigProvider.AddValue(TargetIndexingConfig.BATCH_SIZE_KEY, 10);
-            //testConfigProvider.AddValue(TargetIndexingConfig.INDEX_THROTTLE_TIME_PERIOD_KEY, TimeSpan.FromSeconds(10));
-            //testConfigProvider.AddValue(TargetIndexingConfig.MAX_INDEXES_PER_THROTTLE_KEY, 10);
-            //testConfigProvider.AddValue(TargetIndexingConfig.REINSTATE_INDEX_REFRESH_KEY, true);
-            //testConfigProvider.AddValue(TargetIndexingConfig.SUSPEND_INDEX_REFRESH_KEY, true);
-            //
-            //_testIndexWorker = 
-            //    new IndexWorker(
-            //        new EsIndexClient(
-            //            new TargetIndexingConfig(
-            //                testConfigProvider)));
+            var container = new WindsorContainer();
+            container.Install(
+                FromAssembly.InDirectory(
+                    new AssemblyFilter(".", "ElasticSearchReIndexer.exe")));
+
+            _fixture = new Fixture();
+
+            var indexName = _fixture.Create<string>();
+            var typeName = _fixture.Create<string>();
+
+            _fixture.Customize(new IndexWorkerIntegrationCustomisation(indexName, typeName, container));
+            _fixture.Customize(new ScrollWorkerIntegrationCustomisation(indexName, typeName, container));
+            _fixture.Customize(new EsIntegrationCustomisations(indexName, typeName));
         }
 
-        [Theory]
-        [CustomizedAutoData(typeof(EsIntegrationCustomisations))]
-        public void BulkIndex_addsSingleDoc_Successfully(
-            EsDocument testDoc, 
-            EsTestIndexClient testClient,
-            IndexWorker indexWorker)
+        [Fact]
+        public void BulkIndex_addsSingleDoc_Successfully()
         {
-            indexWorker
-                .Index(new List<EsDocument>() { testDoc })
-                .Should().Be(true);
+            AutoTest
+                .With(_fixture)
+                .Start<EsDocument, EsTestIndexClient, IndexWorker>(
+                    (  doc1, testClient, indexWorker) =>
+                    {
+                        indexWorker
+                            .Index(new List<EsDocument>() { doc1 })
+                            .Should().Be(true);
 
-            using (testClient.ForTestAssertionQueries())
-            {
-                testClient.GetAllDocs().Single().ToString().Should().Be(testDoc.Data.ToString());
-            }
+                        using (testClient.ForTestAssertions())
+                        {
+                            testClient.GetAllDocs().Single().ToString().Should().Be(doc1.Data.ToString());
+                        }
+                    });
         }
 
-        [Theory]
-        [CustomizedAutoData(typeof(EsIntegrationCustomisations))]
-        public void BulkIndex_addsMultipleDoc_Successfully(
-            EsDocument doc1, 
-            EsDocument doc2, 
-            EsDocument doc3, 
-            EsTestIndexClient testClient,
-            IndexWorker indexWorker)
+        [Fact]
+        public void BulkIndex_addsMultipleDoc_Successfully()
         {
-            indexWorker
-                .Index(new[] { doc1, doc2, doc3 })
-                .Should().Be(true);
+            AutoTest
+                .With(_fixture)
+                .Start<EsDocument, EsDocument, EsDocument, EsTestIndexClient, IndexWorker>(
+                      (doc1, doc2, doc3, testClient, indexWorker) => 
+                {
+                    indexWorker
+                        .Index(new[] { doc1, doc2, doc3 })
+                        .Should().Be(true);
 
-            using (testClient.ForTestAssertionQueries())
-            {
-                testClient.GetAllDocs().Should().HaveCount(3);
-            }
-        }
-
-        public void Dispose()
-        {
+                    using (testClient.ForTestAssertions())
+                    {
+                        testClient.GetAllDocs().Should().HaveCount(3);
+                    }
+                });
         }
     }
 }

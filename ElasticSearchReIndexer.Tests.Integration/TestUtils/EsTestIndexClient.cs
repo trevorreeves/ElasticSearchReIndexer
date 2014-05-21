@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ElasticSearchReIndexer.Models;
 using Nest;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
@@ -36,12 +37,12 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
 
         public IEnumerable<JObject> GetAllDocs()
         {
-            var d = new SearchDescriptor<JObject>();
-            d.Index(_indexName);
-            d.Type("all");
-            d.MatchAll();
+            var res = _client.Search<JObject>(
+                    s => s.MatchAll()
+                          .Index(_indexName)
+                          .AllTypes());
 
-            return _client.Search<JObject>(d).Documents;
+            return res.Documents;
         }
 
         public EsDocument GetCorrespondingDoc(EsDocument seedDoc)
@@ -59,10 +60,11 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
             return new EsDocument(_indexName, _type, testDoc);
         }
 
-        public InitializingUnitOfWork ForTestAssertionQueries()
+        public InitializingUnitOfWork ForTestAssertions()
         {
             return new InitializingUnitOfWork(
-                () => this.Refresh());
+                () => this.Refresh(),
+                () => this.Delete());
         }
 
         public void Dispose()
@@ -73,13 +75,19 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
 
     public class InitializingUnitOfWork : IDisposable
     {
-        public InitializingUnitOfWork(Action initialisationStep)
+        private readonly Action _finalisationStep;
+
+        public InitializingUnitOfWork(
+            Action initialisationStep,
+            Action finalisationStep)
         {
             initialisationStep();
+            _finalisationStep = finalisationStep;
         }
 
         public void Dispose()
         {
+            _finalisationStep();
         }
     }
 }

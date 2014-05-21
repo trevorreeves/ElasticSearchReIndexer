@@ -35,6 +35,14 @@ namespace ElasticSearchReIndexer.Workers
             return res.ScrolledDocs.Select(d => new EsDocument(d.Index, d.Type, d.Doc));
         }
 
+        public IEsScrollClient Client
+        {
+            get
+            {
+                return _client;
+            }
+        }
+
         private void InitiateScrollOnServer()
         {
             _currentScrollId = _client.BeginScroll();

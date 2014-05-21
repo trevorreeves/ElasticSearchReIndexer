@@ -57,5 +57,13 @@ namespace ElasticSearchReIndexer.Clients
                     d.Type,
                     d.Source)));
         }
+
+        public ISourceScrollConfig Config
+        {
+            get
+            {
+                return _config;
+            }
+        }
     }
 }

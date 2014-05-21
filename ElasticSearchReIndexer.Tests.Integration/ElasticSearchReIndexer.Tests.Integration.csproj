@@ -84,14 +84,17 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ElasticSearchReIndexerFixture.cs" />
+    <Compile Include="TestUtils\AutoTest.cs" />
     <Compile Include="TestUtils\Customisations\EsDocumentCustomisation.cs" />
     <Compile Include="TestUtils\Customisations\EsTestIndexClientCustomisation.cs" />
-    <Compile Include="TestUtils\Customisations\IndexWorkerCustomization.cs" />
+    <Compile Include="TestUtils\Customisations\IndexWorkerIntegrationCustomisation.cs" />
+    <Compile Include="TestUtils\Customisations\ScrollWorkerIntegrationCustomisation.cs" />
     <Compile Include="TestUtils\Customisations\TargetInMemoryConfigProviderCustomisation.cs" />
-    <Compile Include="TestUtils\CustomizedAutoDataAttribute.cs" />
     <Compile Include="TestUtils\GlobalTestSettings.cs" />
     <Compile Include="TestUtils\EsTestIndexClient.cs" />
+    <Compile Include="TestUtils\Installers\SourceConfigProviderInstaller.cs" />
     <Compile Include="TestUtils\Installers\TargetConfigProviderInstaller.cs" />
+    <Compile Include="TestUtils\WindsorAdapter.cs" />
     <Compile Include="Workers\IndexWorkerFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Workers\ScrollWorkerFixture.cs" />
@@ -108,7 +111,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="TestUtils\CustomisationGroups\EsIntegrationCustomisations.cs" />
+    <Compile Include="TestUtils\Customisations\EsIntegrationCustomisations.cs" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

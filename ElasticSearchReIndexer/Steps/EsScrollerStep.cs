@@ -40,24 +40,25 @@ namespace ElasticSearchReIndexer.Steps
         {
             try
             {
+                var worker = new ScrollWorker(new EsScrollClient(_config));
+
                 // single task / synchronous workers pattern...
                 this.ThrowIfSuccessorCancelled(cancellationUnit);
 
-                while (true)
+                var docs = worker.ScrollPage();
+                while (docs.Any())
                 {
-                    // TODO: need to remember the scroll id after each request.
-                    var worker = new ScrollWorker(new EsScrollClient(_config));
-                    foreach (var doc in worker.ScrollPage())
+                    foreach (var doc in docs)
                     {
                         this.ThrowIfSuccessorCancelled(cancellationUnit);
                         scrolledDocs.Add(doc);
                     }
+                    docs = worker.ScrollPage();
                 }
             }
             catch (TaskCanceledException)
             {
                 // our sucessors should have stopped, but lets dot the i's...
-                scrolledDocs.CompleteAdding();
                 throw;
             }
             catch (Exception ex)
@@ -65,14 +66,16 @@ namespace ElasticSearchReIndexer.Steps
                 // because we're the first in the job, don't cause a cancel if we
                 // fail, just say we're finished.  This gives everything further down
                 // stream a chance to process all the data we've gathered so far.
-                scrolledDocs.CompleteAdding();
 
-                
                 // TODO: logging
-                
+
                 throw; // currently throwing.  though I think this will cause a cancel 
                 // on the token.  but we do want to report the exceptioned status of this
                 // task, but just not cause everything else to stop immediately.
+            }
+            finally
+            {
+                scrolledDocs.CompleteAdding();
             }
         }
 

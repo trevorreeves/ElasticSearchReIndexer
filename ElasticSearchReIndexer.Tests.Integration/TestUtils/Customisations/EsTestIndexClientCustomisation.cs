@@ -13,10 +13,12 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Customisations
         private readonly string _indexName;
         private readonly ConnectionSettings _connectionSettings;
 
-        public EsTestIndexClientCustomisation(ConnectionSettings connectionSettings, string index = "")
+        public EsTestIndexClientCustomisation(
+            string serverAddress, 
+            string index = "")
         {
             _indexName = index;
-            _connectionSettings = connectionSettings;
+            _connectionSettings = new ConnectionSettings(new Uri(serverAddress));
         }
 
         public void Customize(IFixture fixture)

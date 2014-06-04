@@ -4,98 +4,74 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Castle.Windsor;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
+using ElasticSearchReIndexer.Tests.Integration.TestUtils;
+using ElasticSearchReIndexer.Tests.Integration.TestUtils.Customisations;
+using ElasticSearchReIndexer.Tests.Integration.TestUtils.Installers;
 using ElasticSearchReIndexer.Workers;
 using FluentAssertions;
 using Nest;
 using Newtonsoft.Json.Linq;
+using Ploeh.AutoFixture;
 using Xunit;
+using Xunit.Extensions;
 
 namespace ElasticSearchReIndexer.Tests.Integration
 {
     public class ElasticSearchReIndexerFixture
     {
-        private const string TEST_INDEX_PREFIX = "indexworkertests";
-        private const string TEST_TYPE = "testtype";
-
-        private IndexWorker _testIndexWorker;
-        private ElasticClient _testEsClient;
-
-        private readonly string _testIndex;
-
-        public ElasticSearchReIndexerFixture()
+        public static Action<IFixture> AutoSetup()
         {
-            _testIndex = TEST_INDEX_PREFIX + "_" + Guid.NewGuid();
+            return fixture =>
+            {
+                var sourceIndex = fixture.Create<string>();
+                var sourceType = fixture.Create<string>();
+                var targetIndex = fixture.Create<string>();
+                var targetType = fixture.Create<string>();
 
-            var testConfigProvider = new InMemoryConfigProvider();
-            testConfigProvider.AddValue(TargetIndexingConfig.SERVER_CONNECTION_STRING_KEY, TestServerConnectionString);
-            testConfigProvider.AddValue(TargetIndexingConfig.INDEX_KEY, _testIndex);
-            testConfigProvider.AddValue(TargetIndexingConfig.TYPE_KEY, TEST_TYPE);
-            testConfigProvider.AddValue(TargetIndexingConfig.BATCH_SIZE_KEY, 10);
-            testConfigProvider.AddValue(TargetIndexingConfig.INDEX_THROTTLE_TIME_PERIOD_KEY, TimeSpan.FromSeconds(10));
-            testConfigProvider.AddValue(TargetIndexingConfig.MAX_INDEXES_PER_THROTTLE_KEY, 10);
-            testConfigProvider.AddValue(TargetIndexingConfig.REINSTATE_INDEX_REFRESH_KEY, true);
-            testConfigProvider.AddValue(TargetIndexingConfig.SUSPEND_INDEX_REFRESH_KEY, true);
+                var container = new WindsorContainer()
+                    .Install(new ElasticSearchReIndexerInstaller())
+                    .Install(new TargetConfigProviderInstaller(targetIndex, targetType))
+                    .Install(new SourceConfigProviderInstaller(sourceIndex, sourceType));
 
-            _testIndexWorker =
-                new IndexWorker(
-                    new EsIndexClient(
-                        new TargetIndexingConfig(
-                            testConfigProvider)));
-        }
-
-        [Fact]
-        public void ReIndex_SingleBatchOfDocsInSource_ReIndexesCorrectly()
-        {
-            // setup data in source
-            var testDocs = new List<EsDocument>() {
-                GenerateTestDoc("1"),
-                GenerateTestDoc("2"),
-                GenerateTestDoc("3"),
+                fixture
+                    .Customize(new WindsorAdapterCustomization(container))
+                    .Customize(new EsDocumentCustomisation(sourceIndex, sourceType))
+                    .Customize(new EsTestIndexClientCustomisation(GlobalTestSettings.TestTargetServerConnectionString, targetIndex));
             };
-
-            _testIndexWorker
-                .Index(testDocs)
-                .Should().Be(true);
-
-            TestEsClient.Refresh(_testIndex);
-
-            // setup indexer to test destination
-
-            // run re-indexer
-
-            // verify data in destination.
         }
 
-        private string TestServerConnectionString
+        [Theory]
+        [AutoSetup]
+        public void ReIndex_SingleBatchOfDocsInSource_ReIndexesCorrectly(
+            EsDocument doc1,
+            EsDocument doc2,
+            EsDocument doc3,
+            ElasticSearchReIndexer reindexer,
+            ISourceScrollConfig sourceConfig,
+            ITargetIndexingConfig targetConfig)
         {
-            get
+            var testSourceClient = 
+                new EsTestIndexClient(
+                    GlobalTestSettings.TestSourceServerConnectionString, sourceConfig.IndexIdentifier);
+
+            var testTargetClient = 
+                new EsTestIndexClient(
+                    GlobalTestSettings.TestTargetServerConnectionString, targetConfig.Index);
+
+            testSourceClient.Index(doc1, doc2, doc3);
+
+            using (testSourceClient.ForTestAssertions())
             {
-                return ConfigurationManager.AppSettings[TargetIndexingConfig.SERVER_CONNECTION_STRING_KEY];
+                reindexer.StartIndexing();
             }
-        }
 
-        private EsDocument GenerateTestDoc(string id)
-        {
-            var testDoc =
-                JObject.Parse(
-                    string.Format("{{ \"_id\" : \"{0}\", \"dude\" : true }}", id));
-
-            return new EsDocument(_testIndex, TEST_TYPE, testDoc);
-        }
-
-        private ElasticClient TestEsClient
-        {
-            get
+            using (testTargetClient.ForTestAssertions())
             {
-                if (_testEsClient == null)
-                {
-                    _testEsClient = new ElasticClient(
-                    new ConnectionSettings(new Uri(this.TestServerConnectionString)));
-                }
-                return _testEsClient;
+                testTargetClient.GetAllDocs().Should().HaveCount(3);    
             }
         }
     }

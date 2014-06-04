@@ -40,7 +40,10 @@ namespace ElasticSearchReIndexer
 
             // sink - start indexing - in = es doc batches
             var indexer = new EsIndexerStep(_targetConfig);
-            indexer.StartIndexing(reIndexTaskCancellationUnit, sourceDocBatches);
+            var indexingCancellationUnit = new JobCancellationUnit();
+            var sinkTask = indexer.StartIndexing(indexingCancellationUnit, sourceDocBatches);
+
+            sinkTask.Wait(indexingCancellationUnit.Token);
         }
     }
 }

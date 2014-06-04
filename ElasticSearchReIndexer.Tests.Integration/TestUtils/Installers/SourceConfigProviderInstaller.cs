@@ -33,7 +33,7 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Installers
             testConfigProvider.AddValue(SourceScrollConfig.FILTER_DOC_KEY, new JObject());
             testConfigProvider.AddValue(SourceScrollConfig.SCROLL_THROTTLE_TIME_PERIOD_KEY, TimeSpan.FromSeconds(10));
             testConfigProvider.AddValue(SourceScrollConfig.MAX_SCROLLS_PER_THROTTLE_KEY, 10);
-
+            
             container.Register(
                 Component.For<IConfigProvider>().Instance(testConfigProvider).Named("testSourceConfigProvider"),
                 Component.For<ISourceScrollConfig>()

@@ -72,19 +72,21 @@ namespace ElasticSearchReIndexer.Steps
                     destination.Add(currentBatch);
                 }
             }
-            catch (TaskCanceledException) 
+            catch (TaskCanceledException)
             {
                 // our sucessors should have stopped, but lets dot the i's...
-                destination.CompleteAdding();
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //TODO: logging
                 cancellationUnit.Cancel(); // cancel predecessors
-                destination.CompleteAdding(); // tell successors there's no more where that came from.
-                
+
                 throw;
+            }
+            finally
+            {
+                destination.CompleteAdding();
             }
         }
 

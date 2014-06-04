@@ -23,15 +23,16 @@ namespace ElasticSearchReIndexer.Tests.Unit
 
         private readonly IndexWorker _testWorker;
         private readonly Mock<IEsIndexClient> _mockEsClient;
+        private readonly Mock<ITargetIndexingConfig> _mockConfig;
         private readonly MockRepository _mockRepo = 
             new MockRepository(MockBehavior.Strict) { DefaultValue = DefaultValue.Mock };
         
         public IndexWorkerFixture()
         {
-            var testConfig = _mockRepo.Create<ITargetIndexingConfig>();
+            _mockConfig = _mockRepo.Create<ITargetIndexingConfig>();
             _mockEsClient = _mockRepo.Create<IEsIndexClient>();
 
-            _testWorker = new IndexWorker(_mockEsClient.Object);
+            _testWorker = new IndexWorker(_mockConfig.Object, _mockEsClient.Object);
         }
 
         [Fact]
@@ -109,7 +110,7 @@ namespace ElasticSearchReIndexer.Tests.Unit
 @"{{""index"":{{""_index"":""{0}"",""_type"":""{1}"",""_id"":""{2}""}}}}
 {3}
 ",
- doc.Index, doc.Type, doc.Id, doc.Data.ToString(Newtonsoft.Json.Formatting.None));
+ _mockConfig.Object.Index, _mockConfig.Object.Type, doc.Id, doc.Data.ToString(Newtonsoft.Json.Formatting.None));
         }
     }
 }

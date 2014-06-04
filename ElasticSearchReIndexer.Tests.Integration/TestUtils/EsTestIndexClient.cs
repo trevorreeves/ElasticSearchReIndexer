@@ -15,7 +15,13 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
     {
         private readonly ElasticClient _client;
         private readonly string _indexName;
-        private readonly string _type;
+
+        public EsTestIndexClient(
+            string server,
+            string indexName) :
+            this(new ConnectionSettings(new Uri(server)), indexName)
+        {
+        }
 
         public EsTestIndexClient(
             ConnectionSettings connectionSettings, 
@@ -35,6 +41,14 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
             _client.DeleteIndex(_indexName);
         }
 
+        public void Index(params EsDocument[] docs)
+        {
+            foreach(var doc in docs)
+            {
+                _client.Index(doc.Data, doc.Index, doc.Type, doc.Id);
+            }
+        }
+
         public IEnumerable<JObject> GetAllDocs()
         {
             var res = _client.Search<JObject>(
@@ -49,15 +63,6 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils
         {
             var doc = _client.Get<JObject>(seedDoc.Index, seedDoc.Type, seedDoc.Id);
             return new EsDocument(seedDoc.Index, seedDoc.Type, doc);
-        }
-
-        private EsDocument GenerateTestDoc(string id)
-        {
-            var testDoc =
-                JObject.Parse(
-                    string.Format("{{ \"_id\" : \"{0}\", \"dude\" : true }}", id));
-
-            return new EsDocument(_indexName, _type, testDoc);
         }
 
         public InitializingUnitOfWork ForTestAssertions()

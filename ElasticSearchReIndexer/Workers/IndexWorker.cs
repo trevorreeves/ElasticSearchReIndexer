@@ -5,17 +5,21 @@ using ElasticSearchReIndexer.Clients;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using ElasticSearchReIndexer.Models;
+using ElasticSearchReIndexer.Config;
 
 namespace ElasticSearchReIndexer.Workers
 {
     public class IndexWorker
     {
+        private readonly ITargetIndexingConfig _config;
         private readonly IEsIndexClient _client;
 
-        public IndexWorker(IEsIndexClient client)
+        public IndexWorker(ITargetIndexingConfig config, IEsIndexClient client)
         {
+            Contract.Requires(config != null);
             Contract.Requires(client != null);
 
+            _config = config;
             _client = client;
         }
 
@@ -25,15 +29,16 @@ namespace ElasticSearchReIndexer.Workers
 
             foreach (var doc in docs)
             {
+                var newDoc = new EsDocument(_config.Index, _config.Type, doc.Data);
                 bulkBodyBuilder.AppendLine(
                     new JObject(
                         new JProperty("index",
                             new JObject(
-                                new JProperty("_index", doc.Index),
-                                new JProperty("_type", doc.Type),
-                                new JProperty("_id", doc.Id)))).ToString(Newtonsoft.Json.Formatting.None));
+                                new JProperty("_index", newDoc.Index),
+                                new JProperty("_type", newDoc.Type),
+                                new JProperty("_id", newDoc.Id)))).ToString(Newtonsoft.Json.Formatting.None));
 
-                bulkBodyBuilder.AppendLine(doc.Data.ToString(Newtonsoft.Json.Formatting.None));
+                bulkBodyBuilder.AppendLine(newDoc.Data.ToString(Newtonsoft.Json.Formatting.None));
             }
 
             var bulkBody = bulkBodyBuilder.ToString();

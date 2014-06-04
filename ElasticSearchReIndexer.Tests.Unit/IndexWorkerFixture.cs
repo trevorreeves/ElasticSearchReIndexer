@@ -30,6 +30,7 @@ namespace ElasticSearchReIndexer.Tests.Unit
         public IndexWorkerFixture()
         {
             _mockConfig = _mockRepo.Create<ITargetIndexingConfig>();
+            
             _mockEsClient = _mockRepo.Create<IEsIndexClient>();
 
             _testWorker = new IndexWorker(_mockConfig.Object, _mockEsClient.Object);
@@ -52,6 +53,8 @@ namespace ElasticSearchReIndexer.Tests.Unit
         public void OneDocumentBatch_Indexed_Correctly()
         {
             // arrange
+            _mockConfig.Setup(c => c.Index).Returns("testindex");
+            _mockConfig.Setup(c => c.Type).Returns("testtype");
             var testDoc = GenerateTestDoc("1");
 
             var testDocs = new List<EsDocument>()
@@ -73,6 +76,9 @@ namespace ElasticSearchReIndexer.Tests.Unit
         public void MultipleDocumentBatch_Indexed_Correctly()
         {
             // arrange
+            _mockConfig.Setup(c => c.Index).Returns("testindex");
+            _mockConfig.Setup(c => c.Type).Returns("testtype");
+
             var testDoc1 = GenerateTestDoc("1");
             var testDoc2 = GenerateTestDoc("2");
 

@@ -24,7 +24,7 @@ namespace ElasticSearchReIndexer
             _targetConfig = targetConfig;
         }
 
-        public void StartIndexing()
+        public Task StartIndexingAsync()
         {
             var reIndexTaskCancellationUnit = new JobCancellationUnit();
 
@@ -41,9 +41,7 @@ namespace ElasticSearchReIndexer
             // sink - start indexing - in = es doc batches
             var indexer = new EsIndexerStep(_targetConfig);
             var indexingCancellationUnit = new JobCancellationUnit();
-            var sinkTask = indexer.StartIndexing(indexingCancellationUnit, sourceDocBatches);
-
-            sinkTask.Wait(indexingCancellationUnit.Token);
+            return indexer.StartIndexingAsync(indexingCancellationUnit, sourceDocBatches);
         }
     }
 }

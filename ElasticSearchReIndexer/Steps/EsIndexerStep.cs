@@ -19,15 +19,12 @@ namespace ElasticSearchReIndexer.Steps
             _config = config;
         }
 
-        public Task StartIndexing(
+        public Task StartIndexingAsync(
             JobCancellationUnit cancellationUnit,
             BlockingCollection<List<EsDocument>> sourceBatches)
         {
             var indexingTask = new Task(
-                () => ScheduleIndexWorkers(cancellationUnit, sourceBatches),
-                cancellationUnit.Token);
-
-            indexingTask.Start();
+                () => ScheduleIndexWorkers(cancellationUnit, sourceBatches));
 
             return indexingTask;
         }
@@ -36,6 +33,7 @@ namespace ElasticSearchReIndexer.Steps
             JobCancellationUnit cancellationUnit,
             BlockingCollection<List<EsDocument>> sourceBatches)
         {
+            var indexTasks = new List<Task>();
             try
             {
                 while (this.PossiblyMoreInSourceStream(sourceBatches))
@@ -48,12 +46,13 @@ namespace ElasticSearchReIndexer.Steps
                             {
                                 var indexer = new IndexWorker(_config, new EsIndexClient(_config));
                                 indexer.Index(currentBatch);
-                            },
-                            cancellationUnit.Token);
+                            });
 
                         batchIndexTask.Start();
+                        indexTasks.Add(batchIndexTask);
                     }
                 }
+                Task.WaitAll(indexTasks.ToArray());
 
                 new EsIndexClient(_config).Refresh();
             }

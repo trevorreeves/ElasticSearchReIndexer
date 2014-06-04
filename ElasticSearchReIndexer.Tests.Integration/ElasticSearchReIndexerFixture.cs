@@ -46,7 +46,7 @@ namespace ElasticSearchReIndexer.Tests.Integration
 
         [Theory]
         [AutoSetup]
-        public void ReIndex_SingleBatchOfDocsInSource_ReIndexesCorrectly(
+        public async void ReIndex_SingleBatchOfDocsInSource_ReIndexesCorrectly(
             EsDocument doc1,
             EsDocument doc2,
             EsDocument doc3,
@@ -66,7 +66,7 @@ namespace ElasticSearchReIndexer.Tests.Integration
 
             using (testSourceClient.ForTestAssertions())
             {
-                reindexer.StartIndexing();
+                await reindexer.StartIndexingAsync();
             }
 
             using (testTargetClient.ForTestAssertions())

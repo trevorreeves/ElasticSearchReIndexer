@@ -77,9 +77,11 @@
     <Compile Include="Steps\IEsDocumentBatcherStep.cs" />
     <Compile Include="Steps\IEsIndexerStep.cs" />
     <Compile Include="Steps\IEsScrollerStep.cs" />
+    <Compile Include="Workers\IIndexWorkerFactory.cs" />
     <Compile Include="Workers\IndexWorker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Workers\IScrollWorkerFactory.cs" />
     <Compile Include="Workers\ScrollWorker.cs" />
   </ItemGroup>
   <ItemGroup>

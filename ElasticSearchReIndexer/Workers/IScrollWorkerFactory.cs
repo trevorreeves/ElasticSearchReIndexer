@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ElasticSearchReIndexer.Clients
+namespace ElasticSearchReIndexer.Workers
 {
-    public interface IEsIndexClient
+    public interface IScrollWorkerFactory
     {
-        bool Bulk(string body);
-
-        void Refresh();
+        ScrollWorker Create();
     }
 }

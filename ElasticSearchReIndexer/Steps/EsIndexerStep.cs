@@ -13,10 +13,17 @@ namespace ElasticSearchReIndexer.Steps
     public class EsIndexerStep : IEsIndexerStep
     {
         private readonly ITargetIndexingConfig _config;
+        private readonly IIndexWorkerFactory _workerFactory;
+        private readonly IEsIndexClient _flushingClient;
 
-        public EsIndexerStep(ITargetIndexingConfig config)
+        public EsIndexerStep(
+            ITargetIndexingConfig config,
+            IIndexWorkerFactory workerFactory,
+            IEsIndexClient flushingClient)
         {
             _config = config;
+            _workerFactory = workerFactory;
+            _flushingClient = flushingClient;
         }
 
         public Task StartIndexingAsync(
@@ -44,8 +51,9 @@ namespace ElasticSearchReIndexer.Steps
                         var batchIndexTask = new Task(
                             () =>
                             {
-                                var indexer = new IndexWorker(_config, new EsIndexClient(_config));
+                                var indexer = _workerFactory.Create();
                                 indexer.Index(currentBatch);
+                                // TODO : dispose of indexer
                             });
 
                         batchIndexTask.Start();
@@ -54,7 +62,7 @@ namespace ElasticSearchReIndexer.Steps
                 }
                 Task.WaitAll(indexTasks.ToArray());
 
-                new EsIndexClient(_config).Refresh();
+                _flushingClient.Refresh();
             }
             catch (Exception)
             {

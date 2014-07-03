@@ -15,9 +15,9 @@ namespace ElasticSearchReIndexer.Installers
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
             container.Register(
-                Component.For<IConfigProvider>().ImplementedBy<InMemoryConfigProvider>().LifestyleTransient(),
-                Component.For<ITargetIndexingConfig>().ImplementedBy<TargetIndexingConfig>().LifestyleTransient(),
-                Component.For<ISourceScrollConfig>().ImplementedBy<SourceScrollConfig>().LifestyleTransient()
+                Component.For<IConfigProvider>().ImplementedBy<InMemoryConfigProvider>().LifestyleSingleton(),
+                Component.For<ITargetIndexingConfig>().ImplementedBy<TargetIndexingConfig>().LifestyleSingleton(),
+                Component.For<ISourceScrollConfig>().ImplementedBy<SourceScrollConfig>().LifestyleSingleton()
             );
         }
     }

@@ -10,7 +10,7 @@ using ElasticSearchReIndexer.Workers;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public class EsIndexerStep
+    public class EsIndexerStep : IEsIndexerStep
     {
         private readonly ITargetIndexingConfig _config;
 

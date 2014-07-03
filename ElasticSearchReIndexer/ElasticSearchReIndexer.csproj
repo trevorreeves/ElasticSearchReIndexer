@@ -67,12 +67,16 @@
     <Compile Include="ElasticSearchReIndexer.cs" />
     <Compile Include="Installers\ClientsInstaller.cs" />
     <Compile Include="Installers\ConfigInstaller.cs" />
+    <Compile Include="Installers\StepsInstaller.cs" />
     <Compile Include="Installers\WorkersInstaller.cs" />
     <Compile Include="Steps\EsIndexerStep.cs" />
     <Compile Include="Steps\EsScrollerStep.cs" />
     <Compile Include="Models\EsDocument.cs" />
     <Compile Include="Steps\EsDocumentBatcherStep.cs" />
     <Compile Include="Models\JobCancellationUnit.cs" />
+    <Compile Include="Steps\IEsDocumentBatcherStep.cs" />
+    <Compile Include="Steps\IEsIndexerStep.cs" />
+    <Compile Include="Steps\IEsScrollerStep.cs" />
     <Compile Include="Workers\IndexWorker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

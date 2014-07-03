@@ -13,15 +13,21 @@ namespace ElasticSearchReIndexer
 {
     public class ElasticSearchReIndexer
     {
-        private readonly ISourceScrollConfig _sourceConfig;
         private readonly ITargetIndexingConfig _targetConfig;
+        private readonly IEsScrollerStep _scroller;
+        private readonly IEsDocumentBatcherStepFactory _batcherFactory;
+        private readonly IEsIndexerStep _indexer;
 
         public ElasticSearchReIndexer(
-            ISourceScrollConfig sourceConfig,
-            ITargetIndexingConfig targetConfig)
+            ITargetIndexingConfig targetConfig,
+            IEsDocumentBatcherStepFactory batcherFactory,
+            IEsScrollerStep scroller,
+            IEsIndexerStep indexerStep)
         {
-            _sourceConfig = sourceConfig;
             _targetConfig = targetConfig;
+            _scroller = scroller;
+            _batcherFactory = batcherFactory;
+            _indexer = indexerStep;
         }
 
         public Task StartIndexingAsync()
@@ -29,19 +35,17 @@ namespace ElasticSearchReIndexer
             var reIndexTaskCancellationUnit = new JobCancellationUnit();
 
             // tap - start scrolling - out = es docs
-            var scroller = new EsScrollerStep(_sourceConfig);
-            var sourceDocs = scroller.StartScrollingToEnd(reIndexTaskCancellationUnit);
+            var sourceDocs = _scroller.StartScrollingToEnd(reIndexTaskCancellationUnit);
 
             // batcher/transformer - start batching - in = es docs, out = es doc batches
-            var batcher = new EsDocumentBatcherStep(_targetConfig.BatchSize);
+            var batcher = _batcherFactory.Create(_targetConfig.BatchSize);
             var sourceDocBatches = batcher.StartBatching(reIndexTaskCancellationUnit, sourceDocs);
 
             // TODO: throttler
 
             // sink - start indexing - in = es doc batches
-            var indexer = new EsIndexerStep(_targetConfig);
             var indexingCancellationUnit = new JobCancellationUnit();
-            return indexer.StartIndexingAsync(indexingCancellationUnit, sourceDocBatches);
+            return _indexer.StartIndexingAsync(indexingCancellationUnit, sourceDocBatches);
         }
     }
 }

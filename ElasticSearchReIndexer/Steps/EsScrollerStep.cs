@@ -11,7 +11,7 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public class EsScrollerStep
+    public class EsScrollerStep : IEsScrollerStep
     {
         private readonly ISourceScrollConfig _config;
 

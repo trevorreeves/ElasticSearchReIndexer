@@ -51,9 +51,10 @@ namespace ElasticSearchReIndexer.Steps
                         var batchIndexTask = new Task(
                             () =>
                             {
-                                var indexer = _workerFactory.Create();
-                                indexer.Index(currentBatch);
-                                // TODO : dispose of indexer
+                                using (var workerWrapper = ReleasingWrapper.Create(_workerFactory.Create(), _workerFactory.Release))
+                                {
+                                    workerWrapper.WrappedObject.Index(currentBatch);
+                                }
                             });
 
                         batchIndexTask.Start();

@@ -11,5 +11,7 @@ namespace ElasticSearchReIndexer.Workers
     public interface IIndexWorkerFactory
     {
         IndexWorker Create();
+
+        void Release(IndexWorker childObj);
     }
 }

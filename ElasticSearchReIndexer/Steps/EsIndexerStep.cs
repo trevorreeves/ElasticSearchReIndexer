@@ -6,17 +6,25 @@ using System.Threading.Tasks;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
+using ElasticSearchReIndexer.WindsorExtensions;
 using ElasticSearchReIndexer.Workers;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public class EsIndexerStep
+    public class EsIndexerStep : IEsIndexerStep
     {
         private readonly ITargetIndexingConfig _config;
+        private readonly IIndexWorkerFactory _workerFactory;
+        private readonly IEsIndexClient _flushingClient;
 
-        public EsIndexerStep(ITargetIndexingConfig config)
+        public EsIndexerStep(
+            ITargetIndexingConfig config,
+            IIndexWorkerFactory workerFactory,
+            IEsIndexClient flushingClient)
         {
             _config = config;
+            _workerFactory = workerFactory;
+            _flushingClient = flushingClient;
         }
 
         public Task StartIndexingAsync(
@@ -44,8 +52,10 @@ namespace ElasticSearchReIndexer.Steps
                         var batchIndexTask = new Task(
                             () =>
                             {
-                                var indexer = new IndexWorker(_config, new EsIndexClient(_config));
-                                indexer.Index(currentBatch);
+                                using (var workerWrapper = _workerFactory.CreateForRelease(() => _workerFactory.Create()))
+                                {
+                                    workerWrapper.WrappedObject.Index(currentBatch);
+                                }
                             });
 
                         batchIndexTask.Start();
@@ -54,7 +64,7 @@ namespace ElasticSearchReIndexer.Steps
                 }
                 Task.WaitAll(indexTasks.ToArray());
 
-                new EsIndexClient(_config).Refresh();
+                _flushingClient.Refresh();
             }
             catch (Exception)
             {

@@ -77,6 +77,7 @@
     <Compile Include="Steps\IEsDocumentBatcherStep.cs" />
     <Compile Include="Steps\IEsIndexerStep.cs" />
     <Compile Include="Steps\IEsScrollerStep.cs" />
+    <Compile Include="WindsorExtensions\ReleasingWrapper.cs" />
     <Compile Include="Workers\IIndexWorkerFactory.cs" />
     <Compile Include="Workers\IndexWorker.cs" />
     <Compile Include="Program.cs" />

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
+using ElasticSearchReIndexer.WindsorExtensions;
 using ElasticSearchReIndexer.Workers;
 
 namespace ElasticSearchReIndexer.Steps
@@ -51,7 +52,7 @@ namespace ElasticSearchReIndexer.Steps
                         var batchIndexTask = new Task(
                             () =>
                             {
-                                using (var workerWrapper = ReleasingWrapper.Create(_workerFactory.Create(), _workerFactory.Release))
+                                using (var workerWrapper = _workerFactory.CreateForRelease(() => _workerFactory.Create()))
                                 {
                                     workerWrapper.WrappedObject.Index(currentBatch);
                                 }

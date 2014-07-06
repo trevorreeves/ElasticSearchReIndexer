@@ -8,10 +8,10 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public interface IEsIndexerStep
+    public interface IBatcher<T>
     {
-        Task StartIndexingAsync(
+        BlockingCollection<List<T>> StartBatching(
             JobCancellationUnit cancellationUnit,
-            BlockingCollection<List<EsDocument>> sourceBatches);
+            BlockingCollection<T> source);
     }
 }

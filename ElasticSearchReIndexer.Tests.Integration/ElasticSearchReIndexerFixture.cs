@@ -50,7 +50,7 @@ namespace ElasticSearchReIndexer.Tests.Integration
             EsDocument doc1,
             EsDocument doc2,
             EsDocument doc3,
-            ElasticSearchReIndexer reindexer,
+            DbDataFlow<EsDocument> reindexer,
             ISourceScrollConfig sourceConfig,
             ITargetIndexingConfig targetConfig)
         {
@@ -66,7 +66,7 @@ namespace ElasticSearchReIndexer.Tests.Integration
 
             using (testSourceClient.ForTestAssertions())
             {
-                await reindexer.StartIndexingAsync();
+                await reindexer.StartFlowAsync();
             }
 
             using (testTargetClient.ForTestAssertions())

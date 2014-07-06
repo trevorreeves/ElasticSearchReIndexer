@@ -8,9 +8,9 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public interface IEsScrollerStep
+    public interface ITap<T>
     {
-        BlockingCollection<EsDocument> StartScrollingToEnd(
+        BlockingCollection<T> StartFlowingToEnd(
             JobCancellationUnit cancellationUnit);
     }
 }

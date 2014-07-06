@@ -13,11 +13,11 @@ namespace ElasticSearchReIndexer.WindsorExtensions
 
     public static class ReleasingWrapper
     {
-        public static WrappingObject<T> CreateForRelease<T>(
-            this IReleaser<T> releaser,
-            Func<T> createFunc)
+        public static WrappingObject<TSubject> CreateReleasable<TSubject, TFactory>(
+            this TFactory releaser,
+            Func<TFactory, TSubject> createFunc) where TFactory : IReleaser<TSubject>
         {
-            return new WrappingObject<T>(createFunc(), releaser.Release);
+            return new WrappingObject<TSubject>(createFunc(releaser), releaser.Release);
         }
     }
 
@@ -27,15 +27,20 @@ namespace ElasticSearchReIndexer.WindsorExtensions
 
         public WrappingObject(T obj, Action<T> releaseFunc)
         {
-            this.WrappedObject = obj;
+            this.Object = obj;
             _releaseFunc = releaseFunc;
         }
 
-        public T WrappedObject { get; private set; }
+        public static implicit operator T(WrappingObject<T> o)
+        {
+            return o.Object;
+        }
+
+        public T Object { get; private set; }
 
         public void Dispose()
         {
-            _releaseFunc(this.WrappedObject);
+            _releaseFunc(this.Object);
         }
     }
 }

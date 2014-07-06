@@ -52,9 +52,10 @@ namespace ElasticSearchReIndexer.Steps
                         var batchIndexTask = new Task(
                             () =>
                             {
-                                using (var workerWrapper = _workerFactory.CreateForRelease(() => _workerFactory.Create()))
+                                using (var workerWrapper = _workerFactory.CreateReleasable((f) => f.Create()))
                                 {
-                                    workerWrapper.WrappedObject.Index(currentBatch);
+                                    IndexWorker worker = workerWrapper;
+                                    worker.Index(currentBatch);
                                 }
                             });
 

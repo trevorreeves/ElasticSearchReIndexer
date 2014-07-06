@@ -3,11 +3,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DbDataFlow;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
-using ElasticSearchReIndexer.WindsorExtensions;
 using ElasticSearchReIndexer.Workers;
+using treeves.essentials.castle.windsor;
 
 namespace ElasticSearchReIndexer.Steps
 {

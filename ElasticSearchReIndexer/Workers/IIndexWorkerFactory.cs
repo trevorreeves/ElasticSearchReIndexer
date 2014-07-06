@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
-using ElasticSearchReIndexer.WindsorExtensions;
+using treeves.essentials.castle.windsor;
 
 namespace ElasticSearchReIndexer.Workers
 {

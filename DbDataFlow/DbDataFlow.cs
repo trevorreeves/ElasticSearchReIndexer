@@ -4,12 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ElasticSearchReIndexer.Config;
-using ElasticSearchReIndexer.Workers;
-using ElasticSearchReIndexer.Steps;
-using ElasticSearchReIndexer.Models;
 
-namespace ElasticSearchReIndexer
+namespace DbDataFlow
 {
     public class DbDataFlow<T>
     {

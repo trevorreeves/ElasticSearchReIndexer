@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ElasticSearchReIndexer.Models
+namespace DbDataFlow
 {
     public class JobCancellationUnit
     {

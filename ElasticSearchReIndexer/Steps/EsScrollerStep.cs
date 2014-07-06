@@ -8,6 +8,7 @@ using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Workers;
 using ElasticSearchReIndexer.Models;
+using DbDataFlow;
 
 namespace ElasticSearchReIndexer.Steps
 {

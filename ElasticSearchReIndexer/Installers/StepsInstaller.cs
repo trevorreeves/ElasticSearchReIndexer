@@ -7,6 +7,7 @@ using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
+using ElasticSearchReIndexer.Models;
 using ElasticSearchReIndexer.Steps;
 
 namespace ElasticSearchReIndexer.Installers
@@ -18,10 +19,10 @@ namespace ElasticSearchReIndexer.Installers
             container.AddFacility(new TypedFactoryFacility());
 
             container.Register(
-                Component.For<IEsScrollerStep>().ImplementedBy<EsScrollerStep>().LifestyleSingleton(),
-                Component.For<IEsDocumentBatcherStep>().ImplementedBy<EsDocumentBatcherStep>().LifestyleSingleton(),
-                Component.For<IEsDocumentBatcherStepFactory>().AsFactory().LifestyleSingleton(),
-                Component.For<IEsIndexerStep>().ImplementedBy<EsIndexerStep>().LifestyleSingleton());
+                Component.For<ITap<EsDocument>>().ImplementedBy<EsScrollerStep>().LifestyleSingleton(),
+                Component.For<IBatcher<EsDocument>>().ImplementedBy<EsDocumentBatcherStep>().LifestyleSingleton(),
+                Component.For<IBatcherFactory<EsDocument>>().AsFactory().LifestyleSingleton(),
+                Component.For<ISink<EsDocument>>().ImplementedBy<EsIndexerStep>().LifestyleSingleton());
         }
     }
 }

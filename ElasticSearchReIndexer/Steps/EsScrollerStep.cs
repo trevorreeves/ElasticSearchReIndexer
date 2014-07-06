@@ -11,7 +11,7 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public class EsScrollerStep : IEsScrollerStep
+    public class EsScrollerStep : ITap<EsDocument>
     {
         private readonly IScrollWorkerFactory _workerFactory;
 
@@ -20,7 +20,7 @@ namespace ElasticSearchReIndexer.Steps
             _workerFactory = workerFactory;
         }
 
-        public BlockingCollection<EsDocument> StartScrollingToEnd(
+        public BlockingCollection<EsDocument> StartFlowingToEnd(
             JobCancellationUnit cancellationUnit)
         {
             var scrolledDocs = new BlockingCollection<EsDocument>();

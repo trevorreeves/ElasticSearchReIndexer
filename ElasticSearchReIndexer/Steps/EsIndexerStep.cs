@@ -11,7 +11,7 @@ using ElasticSearchReIndexer.Workers;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public class EsIndexerStep : IEsIndexerStep
+    public class EsIndexerStep : ISink<EsDocument>
     {
         private readonly ITargetIndexingConfig _config;
         private readonly IIndexWorkerFactory _workerFactory;
@@ -27,7 +27,7 @@ namespace ElasticSearchReIndexer.Steps
             _flushingClient = flushingClient;
         }
 
-        public Task StartIndexingAsync(
+        public Task StartDrainingAsync(
             JobCancellationUnit cancellationUnit,
             BlockingCollection<List<EsDocument>> sourceBatches)
         {

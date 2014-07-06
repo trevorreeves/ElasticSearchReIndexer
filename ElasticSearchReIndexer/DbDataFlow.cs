@@ -11,41 +11,41 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer
 {
-    public class ElasticSearchReIndexer
+    public class DbDataFlow<T>
     {
         private readonly ITargetIndexingConfig _targetConfig;
-        private readonly IEsScrollerStep _scroller;
-        private readonly IEsDocumentBatcherStepFactory _batcherFactory;
-        private readonly IEsIndexerStep _indexer;
+        private readonly ITap<T> _tap;
+        private readonly IBatcherFactory<T> _batcherFactory;
+        private readonly ISink<T> _sink;
 
-        public ElasticSearchReIndexer(
+        public DbDataFlow(
             ITargetIndexingConfig targetConfig,
-            IEsDocumentBatcherStepFactory batcherFactory,
-            IEsScrollerStep scroller,
-            IEsIndexerStep indexerStep)
+            IBatcherFactory<T> batcherFactory,
+            ITap<T> tap,
+            ISink<T> sink)
         {
             _targetConfig = targetConfig;
-            _scroller = scroller;
+            _tap = tap;
             _batcherFactory = batcherFactory;
-            _indexer = indexerStep;
+            _sink = sink;
         }
 
         public Task StartIndexingAsync()
         {
-            var reIndexTaskCancellationUnit = new JobCancellationUnit();
+            var sourceCancellationUnit = new JobCancellationUnit();
 
             // tap - start scrolling - out = es docs
-            var sourceDocs = _scroller.StartScrollingToEnd(reIndexTaskCancellationUnit);
+            var sourceStream = _tap.StartFlowingToEnd(sourceCancellationUnit);
 
             // batcher/transformer - start batching - in = es docs, out = es doc batches
             var batcher = _batcherFactory.Create(_targetConfig.BatchSize);
-            var sourceDocBatches = batcher.StartBatching(reIndexTaskCancellationUnit, sourceDocs);
+            var sourceBathStream = batcher.StartBatching(sourceCancellationUnit, sourceStream);
 
             // TODO: throttler
 
             // sink - start indexing - in = es doc batches
-            var indexingCancellationUnit = new JobCancellationUnit();
-            return _indexer.StartIndexingAsync(indexingCancellationUnit, sourceDocBatches);
+            var destinationCancellationUnit = new JobCancellationUnit();
+            return _sink.StartDrainingAsync(destinationCancellationUnit, sourceBathStream);
         }
     }
 }

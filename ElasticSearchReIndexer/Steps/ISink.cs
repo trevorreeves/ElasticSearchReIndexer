@@ -8,9 +8,10 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public interface IEsScrollerStep
+    public interface ISink<T>
     {
-        BlockingCollection<EsDocument> StartScrollingToEnd(
-            JobCancellationUnit cancellationUnit);
+        Task StartDrainingAsync(
+            JobCancellationUnit cancellationUnit,
+            BlockingCollection<List<T>> sourceBatches);
     }
 }

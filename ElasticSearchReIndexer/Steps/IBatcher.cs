@@ -8,15 +8,15 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public interface IEsDocumentBatcherStepFactory
+    public interface IBatcherFactory<T>
     {
-        IEsDocumentBatcherStep Create(int batchSize);
+        IBatcher<T> Create(int batchSize);
     }
 
-    public interface IEsDocumentBatcherStep
+    public interface IBatcher<T>
     {
-        BlockingCollection<List<EsDocument>> StartBatching(
+        BlockingCollection<List<T>> StartBatching(
             JobCancellationUnit cancellationUnit,
-            BlockingCollection<EsDocument> source);
+            BlockingCollection<T> source);
     }
 }

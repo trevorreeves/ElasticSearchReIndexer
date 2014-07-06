@@ -12,7 +12,7 @@ using DbDataFlow;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public class EsScrollerStep : ITap<EsDocument>
+    public class EsScrollerStep : BaseTap<EsDocument>
     {
         private readonly IScrollWorkerFactory _workerFactory;
 
@@ -21,74 +21,31 @@ namespace ElasticSearchReIndexer.Steps
             _workerFactory = workerFactory;
         }
 
-        public BlockingCollection<EsDocument> StartFlowingToEnd(
-            JobCancellationUnit cancellationUnit)
+        protected override Action<BlockingCollection<EsDocument>, Action> GetWorker()
         {
-            var scrolledDocs = new BlockingCollection<EsDocument>();
-
-            var scrollingTask = new Task(
-                () => this.ScheduleScrollingWorkers(cancellationUnit, scrolledDocs),
-                cancellationUnit.Token);
-
-            scrollingTask.Start();
-
-            return scrolledDocs;
-        }
-
-        private void ScheduleScrollingWorkers(
-            JobCancellationUnit cancellationUnit,
-            BlockingCollection<EsDocument> scrolledDocs)
-        {
-            try
-            {
-                var worker = _workerFactory.Create();
-
-                // single task / synchronous workers pattern...
-                this.ThrowIfSuccessorCancelled(cancellationUnit);
-
-                var docs = worker.ScrollPage();
-                while (docs.Any())
+            return new Action<BlockingCollection<EsDocument>, Action>(
+                (scrolledDocs, throwIfTaskCancelled) =>
                 {
-                    foreach (var doc in docs)
+                    try
                     {
-                        this.ThrowIfSuccessorCancelled(cancellationUnit);
-                        scrolledDocs.Add(doc);
+                        var worker = _workerFactory.Create();
+
+                        var docs = worker.ScrollPage();
+                        while (docs.Any())
+                        {
+                            foreach (var doc in docs)
+                            {
+                                throwIfTaskCancelled();
+                                scrolledDocs.Add(doc);
+                            }
+                            docs = worker.ScrollPage();
+                        }
                     }
-                    docs = worker.ScrollPage();
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                // our sucessors should have stopped, but lets dot the i's...
-                throw;
-            }
-            catch (Exception ex)
-            {
-                // because we're the first in the job, don't cause a cancel if we
-                // fail, just say we're finished.  This gives everything further down
-                // stream a chance to process all the data we've gathered so far.
-
-                // TODO: logging
-
-                throw; // currently throwing.  though I think this will cause a cancel 
-                // on the token.  but we do want to report the exceptioned status of this
-                // task, but just not cause everything else to stop immediately.
-            }
-            finally
-            {
-                scrolledDocs.CompleteAdding();
-            }
-        }
-
-        private void ThrowIfSuccessorCancelled(
-            JobCancellationUnit cancellationUnit)
-        {
-            // if something cancelled the job, and we have no predecessor, so we can only
-            // assume that is must have been a successor, so we must end.
-            if (cancellationUnit.IsCancellationRequested)
-            {
-                cancellationUnit.ThrowIfCancelled();
-            }
+                    finally
+                    {
+                        scrolledDocs.CompleteAdding();
+                    }
+                });
         }
     }
 }

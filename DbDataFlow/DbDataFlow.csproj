@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbDataFlow.cs" />
+    <Compile Include="BaseTap.cs" />
     <Compile Include="IBatcher.cs" />
     <Compile Include="ISink.cs" />
     <Compile Include="ITap.cs" />

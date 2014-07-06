@@ -8,11 +8,6 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public interface IBatcherFactory<T>
-    {
-        IBatcher<T> Create(int batchSize);
-    }
-
     public interface IBatcher<T>
     {
         BlockingCollection<List<T>> StartBatching(

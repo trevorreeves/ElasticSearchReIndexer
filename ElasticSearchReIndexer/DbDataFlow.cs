@@ -13,24 +13,21 @@ namespace ElasticSearchReIndexer
 {
     public class DbDataFlow<T>
     {
-        private readonly ITargetIndexingConfig _targetConfig;
         private readonly ITap<T> _tap;
-        private readonly IBatcherFactory<T> _batcherFactory;
+        private readonly IBatcher<T> _batcher;
         private readonly ISink<T> _sink;
 
         public DbDataFlow(
-            ITargetIndexingConfig targetConfig,
-            IBatcherFactory<T> batcherFactory,
             ITap<T> tap,
+            IBatcher<T> batcher,
             ISink<T> sink)
         {
-            _targetConfig = targetConfig;
             _tap = tap;
-            _batcherFactory = batcherFactory;
+            _batcher = batcher;
             _sink = sink;
         }
 
-        public Task StartIndexingAsync()
+        public Task StartFlowAsync()
         {
             var sourceCancellationUnit = new JobCancellationUnit();
 
@@ -38,8 +35,7 @@ namespace ElasticSearchReIndexer
             var sourceStream = _tap.StartFlowingToEnd(sourceCancellationUnit);
 
             // batcher/transformer - start batching - in = es docs, out = es doc batches
-            var batcher = _batcherFactory.Create(_targetConfig.BatchSize);
-            var sourceBathStream = batcher.StartBatching(sourceCancellationUnit, sourceStream);
+            var sourceBathStream = _batcher.StartBatching(sourceCancellationUnit, sourceStream);
 
             // TODO: throttler
 

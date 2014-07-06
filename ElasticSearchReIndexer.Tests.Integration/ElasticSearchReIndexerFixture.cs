@@ -66,7 +66,7 @@ namespace ElasticSearchReIndexer.Tests.Integration
 
             using (testSourceClient.ForTestAssertions())
             {
-                await reindexer.StartIndexingAsync();
+                await reindexer.StartFlowAsync();
             }
 
             using (testTargetClient.ForTestAssertions())

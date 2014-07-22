@@ -10,7 +10,7 @@ using ElasticSearchReIndexer.Models;
 
 namespace ElasticSearchReIndexer.Steps
 {
-    public class EsDocumentBatcherStep : IBatcher<EsDocument>
+    public class EsDocumentBatcherStep : IBatcher<EsDocument, List<EsDocument>>
     {
         private readonly int _batchSize;
 

@@ -51,7 +51,7 @@ namespace ElasticSearchReIndexer.Tests.Integration
             EsDocument doc1,
             EsDocument doc2,
             EsDocument doc3,
-            DbDataFlow<EsDocument> reindexer,
+            DbDataFlow<EsDocument, List<EsDocument>> reindexer,
             ISourceScrollConfig sourceConfig,
             ITargetIndexingConfig targetConfig)
         {

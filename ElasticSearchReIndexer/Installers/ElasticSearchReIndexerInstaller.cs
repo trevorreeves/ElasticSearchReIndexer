@@ -42,13 +42,13 @@ namespace ElasticSearchReIndexer.Installers
 
             container.Register(
                 Component.For<ITap<EsDocument>>().ImplementedBy<EsScrollerStep>().LifestyleSingleton(),
-                Component.For<IBatcher<EsDocument>>()
+                Component.For<IBatcher<EsDocument, List<EsDocument>>>()
                          .ImplementedBy<EsDocumentBatcherStep>()
                          .LifestyleSingleton()
                          .DynamicParameters((k, d) => {
                              d["batchSize"] = container.Resolve<ITargetIndexingConfig>().BatchSize;
                          }),
-                Component.For<ISink<EsDocument>>().ImplementedBy<EsIndexerStep>().LifestyleSingleton());
+                Component.For<ISink<List<EsDocument>>>().ImplementedBy<EsIndexerStep>().LifestyleSingleton());
         }
     }
 }

@@ -11,6 +11,6 @@ namespace DbDataFlow
     {
         Task StartDrainingAsync(
             JobCancellationUnit cancellationUnit,
-            BlockingCollection<List<T>> sourceBatches);
+            BlockingCollection<T> stream);
     }
 }

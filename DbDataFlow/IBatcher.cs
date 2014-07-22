@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DbDataFlow
 {
-    public interface IBatcher<T>
+    public interface IBatcher<T, TOut>
     {
-        BlockingCollection<List<T>> StartBatching(
+        BlockingCollection<TOut> StartBatching(
             JobCancellationUnit cancellationUnit,
             BlockingCollection<T> source);
     }

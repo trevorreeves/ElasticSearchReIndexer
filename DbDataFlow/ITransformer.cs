@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ElasticSearchReIndexer.Models;
 
-namespace ElasticSearchReIndexer.Steps
+namespace DbDataFlow
 {
-    public interface IBatcher<T>
+    public interface ITransformer<T, TTransformed>
     {
-        BlockingCollection<List<T>> StartBatching(
+        BlockingCollection<TTransformed> StartTransforming(
             JobCancellationUnit cancellationUnit,
             BlockingCollection<T> source);
     }

@@ -7,11 +7,13 @@ using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
+using DbDataFlow;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
 using ElasticSearchReIndexer.Steps;
 using ElasticSearchReIndexer.Workers;
+using treeves.essentials.castle.windsor;
 
 namespace ElasticSearchReIndexer.Installers
 {
@@ -19,7 +21,7 @@ namespace ElasticSearchReIndexer.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.AddFacility(new TypedFactoryFacility());
+            container.DependsOnFacility<TypedFactoryFacility>();
 
             container.Register(
                 Component.For<IConfigProvider>().ImplementedBy<InMemoryConfigProvider>().LifestyleSingleton(),
@@ -40,13 +42,13 @@ namespace ElasticSearchReIndexer.Installers
 
             container.Register(
                 Component.For<ITap<EsDocument>>().ImplementedBy<EsScrollerStep>().LifestyleSingleton(),
-                Component.For<IBatcher<EsDocument>>()
+                Component.For<ITransformer<EsDocument, List<EsDocument>>>()
                          .ImplementedBy<EsDocumentBatcherStep>()
                          .LifestyleSingleton()
                          .DynamicParameters((k, d) => {
                              d["batchSize"] = container.Resolve<ITargetIndexingConfig>().BatchSize;
                          }),
-                Component.For<ISink<EsDocument>>().ImplementedBy<EsIndexerStep>().LifestyleSingleton());
+                Component.For<ISink<List<EsDocument>>>().ImplementedBy<EsIndexerStep>().LifestyleSingleton());
         }
     }
 }

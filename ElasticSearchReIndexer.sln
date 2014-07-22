@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticSearchReIndexer.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticSearchReIndexer.Tests.Integration", "ElasticSearchReIndexer.Tests.Integration\ElasticSearchReIndexer.Tests.Integration.csproj", "{54A47A0D-EA42-4FC5-AF4E-6E66D0E5341E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbDataFlow", "DbDataFlow\DbDataFlow.csproj", "{C2CDEAFA-36A0-46D8-9661-19889B50CA51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "treeves.essentials.castle.windsor", "treeves.essentials.castle.windsor\treeves.essentials.castle.windsor.csproj", "{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,14 @@ Global
 		{54A47A0D-EA42-4FC5-AF4E-6E66D0E5341E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54A47A0D-EA42-4FC5-AF4E-6E66D0E5341E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54A47A0D-EA42-4FC5-AF4E-6E66D0E5341E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2CDEAFA-36A0-46D8-9661-19889B50CA51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2CDEAFA-36A0-46D8-9661-19889B50CA51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2CDEAFA-36A0-46D8-9661-19889B50CA51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2CDEAFA-36A0-46D8-9661-19889B50CA51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

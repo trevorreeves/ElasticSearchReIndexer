@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ElasticSearchReIndexer.WindsorExtensions
+namespace treeves.essentials.castle.windsor
 {
     public interface IReleaser<T>
     {

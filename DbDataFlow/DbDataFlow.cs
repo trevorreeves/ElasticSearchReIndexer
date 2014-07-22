@@ -4,26 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ElasticSearchReIndexer.Config;
-using ElasticSearchReIndexer.Workers;
-using ElasticSearchReIndexer.Steps;
-using ElasticSearchReIndexer.Models;
 
-namespace ElasticSearchReIndexer
+namespace DbDataFlow
 {
-    public class DbDataFlow<T>
+    public class DbDataFlow<TSource, TTransformed>
     {
-        private readonly ITap<T> _tap;
-        private readonly IBatcher<T> _batcher;
-        private readonly ISink<T> _sink;
+        private readonly ITap<TSource> _tap;
+        private readonly ITransformer<TSource, TTransformed> _transformer;
+        private readonly ISink<TTransformed> _sink;
 
         public DbDataFlow(
-            ITap<T> tap,
-            IBatcher<T> batcher,
-            ISink<T> sink)
+            ITap<TSource> tap,
+            ITransformer<TSource, TTransformed> transformer,
+            ISink<TTransformed> sink)
         {
             _tap = tap;
-            _batcher = batcher;
+            _transformer = transformer;
             _sink = sink;
         }
 
@@ -35,13 +31,13 @@ namespace ElasticSearchReIndexer
             var sourceStream = _tap.StartFlowingToEnd(sourceCancellationUnit);
 
             // batcher/transformer - start batching - in = es docs, out = es doc batches
-            var sourceBathStream = _batcher.StartBatching(sourceCancellationUnit, sourceStream);
+            var batchStream = _transformer.StartTransforming(sourceCancellationUnit, sourceStream);
 
             // TODO: throttler
-
+            
             // sink - start indexing - in = es doc batches
             var destinationCancellationUnit = new JobCancellationUnit();
-            return _sink.StartDrainingAsync(destinationCancellationUnit, sourceBathStream);
+            return _sink.StartDrainingAsync(destinationCancellationUnit, batchStream);
         }
     }
 }

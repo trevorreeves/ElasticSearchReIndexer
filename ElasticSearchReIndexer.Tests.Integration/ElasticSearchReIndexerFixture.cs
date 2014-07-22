@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Castle.Windsor;
+using DbDataFlow;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using ElasticSearchReIndexer.Models;
@@ -23,6 +24,8 @@ namespace ElasticSearchReIndexer.Tests.Integration
 {
     public class ElasticSearchReIndexerFixture
     {
+        public const int TEST_BATCH_SIZE = 3;
+
         public static Action<IFixture> AutoSetup()
         {
             return fixture =>
@@ -35,7 +38,7 @@ namespace ElasticSearchReIndexer.Tests.Integration
                 var container = new WindsorContainer()
                     .Install(new ElasticSearchReIndexerInstaller())
                     .Install(new TargetConfigProviderInstaller(targetIndex, targetType))
-                    .Install(new SourceConfigProviderInstaller(sourceIndex, sourceType));
+                    .Install(new SourceConfigProviderInstaller(sourceIndex, sourceType, TEST_BATCH_SIZE));
 
                 fixture
                     .Customize(new WindsorAdapterCustomization(container))
@@ -47,13 +50,12 @@ namespace ElasticSearchReIndexer.Tests.Integration
         [Theory]
         [AutoSetup]
         public async void ReIndex_SingleBatchOfDocsInSource_ReIndexesCorrectly(
-            EsDocument doc1,
-            EsDocument doc2,
-            EsDocument doc3,
-            DbDataFlow<EsDocument> reindexer,
+            IFixture fixture,
+            DbDataFlow<EsDocument, List<EsDocument>> reindexer,
             ISourceScrollConfig sourceConfig,
             ITargetIndexingConfig targetConfig)
         {
+            // arrange
             var testSourceClient = 
                 new EsTestIndexClient(
                     GlobalTestSettings.TestSourceServerConnectionString, sourceConfig.IndexIdentifier);
@@ -62,16 +64,52 @@ namespace ElasticSearchReIndexer.Tests.Integration
                 new EsTestIndexClient(
                     GlobalTestSettings.TestTargetServerConnectionString, targetConfig.Index);
 
-            testSourceClient.Index(doc1, doc2, doc3);
+            testSourceClient.Index(
+                fixture.CreateMany<EsDocument>(TEST_BATCH_SIZE * 3).ToArray());
 
+            // act
             using (testSourceClient.ForTestAssertions())
             {
                 await reindexer.StartFlowAsync();
             }
 
+            // assert
             using (testTargetClient.ForTestAssertions())
             {
                 testTargetClient.GetAllDocs().Should().HaveCount(3);    
+            }
+        }
+
+        [Theory]
+        [AutoSetup]
+        public async void ReIndex_MultiBatchOfDocsInSource_ReIndexesCorrectly(
+            IFixture fixture,
+            DbDataFlow<EsDocument, List<EsDocument>> reindexer,
+            ISourceScrollConfig sourceConfig,
+            ITargetIndexingConfig targetConfig)
+        {
+            // arange
+            var testSourceClient =
+                new EsTestIndexClient(
+                    GlobalTestSettings.TestSourceServerConnectionString, sourceConfig.IndexIdentifier);
+
+            var testTargetClient =
+                new EsTestIndexClient(
+                    GlobalTestSettings.TestTargetServerConnectionString, targetConfig.Index);
+
+            testSourceClient.Index(
+                fixture.CreateMany<EsDocument>(TEST_BATCH_SIZE * 3).ToArray());
+
+            // act
+            using (testSourceClient.ForTestAssertions())
+            {
+                await reindexer.StartFlowAsync();
+            }
+
+            // assert
+            using (testTargetClient.ForTestAssertions())
+            {
+                testTargetClient.GetAllDocs().Should().HaveCount(6);
             }
         }
     }

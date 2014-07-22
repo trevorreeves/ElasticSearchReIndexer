@@ -16,7 +16,7 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Installers
         {
             container.Install(
                 FromAssembly.InDirectory(
-                    new AssemblyFilter(".", "ElasticSearchReIndexer.exe")));
+                    new AssemblyFilter(".", "ElasticSearchReIndexer.dll")));
         }
     }
 }

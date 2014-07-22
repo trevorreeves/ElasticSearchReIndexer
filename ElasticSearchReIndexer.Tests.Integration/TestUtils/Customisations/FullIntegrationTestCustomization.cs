@@ -38,7 +38,7 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Customisations
                 new TargetConfigProviderInstaller(_targetIndexName, _targetTypeName));
 
             container.Install(
-                new SourceConfigProviderInstaller(_sourceIndexName, _sourceTypeName));
+                new SourceConfigProviderInstaller(_sourceIndexName, _sourceTypeName, 3));
 
             fixture.Customize(new WindsorAdapterCustomization(container));
             fixture.Customize(new EsDocumentCustomisation(_sourceIndexName, _sourceIndexName));

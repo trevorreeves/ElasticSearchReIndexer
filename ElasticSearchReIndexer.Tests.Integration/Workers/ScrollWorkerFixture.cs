@@ -27,7 +27,7 @@ namespace ElasticSearchReIndexer.Tests.Integration.Workers
                 var container = new WindsorContainer()
                     .Install(new ElasticSearchReIndexerInstaller())
                     .Install(new TargetConfigProviderInstaller(testIndex, testType))
-                    .Install(new SourceConfigProviderInstaller(testIndex, testType));
+                    .Install(new SourceConfigProviderInstaller(testIndex, testType, 3));
 
                 fixture
                     .Customize(new WindsorAdapterCustomization(container))

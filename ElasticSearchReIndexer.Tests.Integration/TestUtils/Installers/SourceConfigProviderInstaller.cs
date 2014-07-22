@@ -16,11 +16,13 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Installers
     {
         private readonly string _index;
         private readonly string _type;
+        private readonly int _batchSize;
 
-        public SourceConfigProviderInstaller(string index, string type)
+        public SourceConfigProviderInstaller(string index, string type, int batchSize)
         {
             _index = index;
             _type = type;
+            _batchSize = batchSize;
         }
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
@@ -29,7 +31,7 @@ namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Installers
             testConfigProvider.AddValue(SourceScrollConfig.SERVER_CONNECTION_STRING_KEY, GlobalTestSettings.TestSourceServerConnectionString);
             testConfigProvider.AddValue(SourceScrollConfig.INDEX_KEY, _index);
             testConfigProvider.AddValue(SourceScrollConfig.TYPE_KEY, _type);
-            testConfigProvider.AddValue(SourceScrollConfig.BATCH_SIZE_KEY, 3);
+            testConfigProvider.AddValue(SourceScrollConfig.BATCH_SIZE_KEY, _batchSize);
             testConfigProvider.AddValue(SourceScrollConfig.FILTER_DOC_KEY, new JObject());
             testConfigProvider.AddValue(SourceScrollConfig.SCROLL_THROTTLE_TIME_PERIOD_KEY, TimeSpan.FromSeconds(10));
             testConfigProvider.AddValue(SourceScrollConfig.MAX_SCROLLS_PER_THROTTLE_KEY, 10);

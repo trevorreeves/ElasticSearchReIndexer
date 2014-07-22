@@ -42,7 +42,7 @@ namespace ElasticSearchReIndexer.Installers
 
             container.Register(
                 Component.For<ITap<EsDocument>>().ImplementedBy<EsScrollerStep>().LifestyleSingleton(),
-                Component.For<IBatcher<EsDocument, List<EsDocument>>>()
+                Component.For<ITransformer<EsDocument, List<EsDocument>>>()
                          .ImplementedBy<EsDocumentBatcherStep>()
                          .LifestyleSingleton()
                          .DynamicParameters((k, d) => {

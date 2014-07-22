@@ -10,12 +10,12 @@ namespace DbDataFlow
     public class DbDataFlow<TSource, TTransformed>
     {
         private readonly ITap<TSource> _tap;
-        private readonly IBatcher<TSource, TTransformed> _transformer;
+        private readonly ITransformer<TSource, TTransformed> _transformer;
         private readonly ISink<TTransformed> _sink;
 
         public DbDataFlow(
             ITap<TSource> tap,
-            IBatcher<TSource, TTransformed> transformer,
+            ITransformer<TSource, TTransformed> transformer,
             ISink<TTransformed> sink)
         {
             _tap = tap;
@@ -31,7 +31,7 @@ namespace DbDataFlow
             var sourceStream = _tap.StartFlowingToEnd(sourceCancellationUnit);
 
             // batcher/transformer - start batching - in = es docs, out = es doc batches
-            var batchStream = _transformer.StartBatching(sourceCancellationUnit, sourceStream);
+            var batchStream = _transformer.StartTransforming(sourceCancellationUnit, sourceStream);
 
             // TODO: throttler
             

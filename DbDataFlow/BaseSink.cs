@@ -28,7 +28,7 @@ namespace ElasticSearchReIndexer.Steps
             var indexTasks = new List<Task>();
             try
             {
-                while (this.PossiblyMoreInSourceStream(stream))
+                while (stream.PossiblyMoreInStream())
                 {
                     T currentItem;
                     if (stream.TryTake(out currentItem, 5 * 1000, cancellationUnit.Token))
@@ -50,11 +50,6 @@ namespace ElasticSearchReIndexer.Steps
 
                 throw;
             }
-        }
-
-        private bool PossiblyMoreInSourceStream(BlockingCollection<T> source)
-        {
-            return source.Any() || !source.IsCompleted;
         }
     }
 }

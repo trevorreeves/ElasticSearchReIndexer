@@ -7,18 +7,6 @@ using Newtonsoft.Json.Linq;
 
 namespace ElasticSearchReIndexer.Config
 {
-    public interface ISourceScrollConfig
-    {
-        string ServerConnectionString { get; }
-        string IndexIdentifier { get; }
-        string TypeIdentifier { get; }
-        JObject FilterDoc { get; }
-        int BatchSize { get; }
-
-        TimeSpan ScrollThrottlingTimePeriod { get; }
-        int MaxScrollsPerThrottlingTimePeriod { get; }
-    }
-
     public class SourceScrollConfig : ISourceScrollConfig
     {
         public const string SERVER_CONNECTION_STRING_KEY = "Source.ConnectionString";

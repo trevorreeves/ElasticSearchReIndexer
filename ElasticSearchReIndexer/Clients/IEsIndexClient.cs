@@ -9,5 +9,7 @@ namespace ElasticSearchReIndexer.Clients
     public interface IEsIndexClient
     {
         bool Bulk(string body);
+
+        void Refresh();
     }
 }

@@ -105,6 +105,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DbDataFlow\DbDataFlow.csproj">
+      <Project>{c2cdeafa-36a0-46d8-9661-19889b50ca51}</Project>
+      <Name>DbDataFlow</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ElasticSearchReIndexer\ElasticSearchReIndexer.csproj">
       <Project>{0c2c0bde-1c43-4e40-9fe2-1d8dc8b831d6}</Project>
       <Name>ElasticSearchReIndexer</Name>

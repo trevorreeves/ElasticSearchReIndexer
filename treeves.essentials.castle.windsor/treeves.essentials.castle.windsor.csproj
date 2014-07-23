@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0C2C0BDE-1C43-4E40-9FE2-1D8DC8B831D6}</ProjectGuid>
+    <ProjectGuid>{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ElasticSearchReIndexer</RootNamespace>
-    <AssemblyName>ElasticSearchReIndexer</AssemblyName>
+    <RootNamespace>treeves.essentials.castle.windsor</RootNamespace>
+    <AssemblyName>treeves.essentials.castle.windsor</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,21 +29,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core">
       <HintPath>..\packages\Castle.Core.3.2.0\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Windsor">
       <HintPath>..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
-    </Reference>
-    <Reference Include="Nest">
-      <HintPath>..\packages\NEST.0.12.0.0\lib\NET4\Nest.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -56,42 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clients\DocResult.cs" />
-    <Compile Include="Clients\IEsIndexClient.cs" />
-    <Compile Include="Clients\IEsScrollClient.cs" />
-    <Compile Include="Clients\ScrollResults.cs" />
-    <Compile Include="Config\IConfigProvider.cs" />
-    <Compile Include="Config\InMemoryConfigProvider.cs" />
-    <Compile Include="Config\ISourceScrollConfig.cs" />
-    <Compile Include="Config\ITargetIndexingConfig.cs" />
-    <Compile Include="Config\SourceScrollConfig.cs" />
-    <Compile Include="Config\TargetIndexingConfig.cs" />
-    <Compile Include="Clients\EsIndexClient.cs" />
-    <Compile Include="Clients\EsScrollClient.cs" />
-    <Compile Include="Installers\ElasticSearchReIndexerInstaller.cs" />
-    <Compile Include="Steps\EsIndexerStep.cs" />
-    <Compile Include="Steps\EsScrollerStep.cs" />
-    <Compile Include="Models\EsDocument.cs" />
-    <Compile Include="Steps\EsDocumentBatcherStep.cs" />
-    <Compile Include="Workers\IIndexWorkerFactory.cs" />
-    <Compile Include="Workers\IndexWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Workers\IScrollWorkerFactory.cs" />
-    <Compile Include="Workers\ScrollWorker.cs" />
+    <Compile Include="ReleasingWrapper.cs" />
+    <Compile Include="WindsorContainerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DbDataFlow\DbDataFlow.csproj">
-      <Project>{c2cdeafa-36a0-46d8-9661-19889b50ca51}</Project>
-      <Name>DbDataFlow</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\treeves.essentials.castle.windsor\treeves.essentials.castle.windsor.csproj">
-      <Project>{248f7ebb-1510-4aef-8e3b-fb2b7c89e16e}</Project>
-      <Name>treeves.essentials.castle.windsor</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

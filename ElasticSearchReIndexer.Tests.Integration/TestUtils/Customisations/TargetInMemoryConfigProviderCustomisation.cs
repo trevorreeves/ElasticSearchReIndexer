@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ElasticSearchReIndexer.Config;
 using Ploeh.AutoFixture;
+using treeves.essentials.config;
 
 namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Customisations
 {

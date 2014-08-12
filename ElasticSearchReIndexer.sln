@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbDataFlow", "DbDataFlow\Db
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "treeves.essentials.castle.windsor", "treeves.essentials.castle.windsor\treeves.essentials.castle.windsor.csproj", "{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticSearchReIndexer.Cmd", "ElasticSearchReIndexer.Cmd\ElasticSearchReIndexer.Cmd.csproj", "{98BCE7D0-45D9-4202-8913-37E8D0098E3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "treeves.essentials.config", "treeves.essentials.config\treeves.essentials.config.csproj", "{9BD644A5-1AB8-4738-949D-F63C06662865}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +41,14 @@ Global
 		{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{248F7EBB-1510-4AEF-8E3B-FB2B7C89E16E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98BCE7D0-45D9-4202-8913-37E8D0098E3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98BCE7D0-45D9-4202-8913-37E8D0098E3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98BCE7D0-45D9-4202-8913-37E8D0098E3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98BCE7D0-45D9-4202-8913-37E8D0098E3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BD644A5-1AB8-4738-949D-F63C06662865}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BD644A5-1AB8-4738-949D-F63C06662865}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BD644A5-1AB8-4738-949D-F63C06662865}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BD644A5-1AB8-4738-949D-F63C06662865}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,33 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using treeves.essentials.config;
 
 namespace ElasticSearchReIndexer.Config
 {
-    public static class ConfigProviderExtensions
-    {
-        public static T AssertConfigValueIsPresent<T>(
-            this IConfigProvider provider, 
-            string key,
-            T valueIfNotPresent = default(T))
-        {
-            T val = provider.GetPropertyValue<T>(key);
-            if (EqualityComparer<T>.Default.Equals(val, default(T)))
-            {
-                if (valueIfNotPresent.Equals(default(T)))
-                {
-                    throw new ArgumentNullException("Config value is not present : " + key);
-                }
-                else
-                {
-                    val = valueIfNotPresent;
-                }
-            }
-
-            return val;
-        }
-    }
-
     public class TargetIndexingConfig : ITargetIndexingConfig
     {
         public const string SERVER_CONNECTION_STRING_KEY = "Target.ConnectionString";

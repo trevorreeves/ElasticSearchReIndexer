@@ -14,6 +14,7 @@ using ElasticSearchReIndexer.Models;
 using ElasticSearchReIndexer.Steps;
 using ElasticSearchReIndexer.Workers;
 using treeves.essentials.castle.windsor;
+using treeves.essentials.config;
 
 namespace ElasticSearchReIndexer.Installers
 {

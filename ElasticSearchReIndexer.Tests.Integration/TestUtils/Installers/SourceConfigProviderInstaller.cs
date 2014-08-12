@@ -9,6 +9,7 @@ using Castle.Windsor;
 using ElasticSearchReIndexer.Clients;
 using ElasticSearchReIndexer.Config;
 using Newtonsoft.Json.Linq;
+using treeves.essentials.config;
 
 namespace ElasticSearchReIndexer.Tests.Integration.TestUtils.Installers
 {

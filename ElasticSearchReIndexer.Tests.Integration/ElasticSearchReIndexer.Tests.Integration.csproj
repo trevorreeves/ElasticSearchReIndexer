@@ -113,6 +113,10 @@
       <Project>{0c2c0bde-1c43-4e40-9fe2-1d8dc8b831d6}</Project>
       <Name>ElasticSearchReIndexer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\treeves.essentials.config\treeves.essentials.config.csproj">
+      <Project>{9bd644a5-1ab8-4738-949d-f63c06662865}</Project>
+      <Name>treeves.essentials.config</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Choose>
